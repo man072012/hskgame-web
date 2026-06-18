@@ -9,12 +9,15 @@ button{font-family:inherit;font-size:.95rem;padding:11px 16px;border-radius:10px
 #del{background:#b01e28;color:#fff;border:none;width:100%;margin-top:12px;font-weight:700}
 #g{background:#fff;width:100%}
 small{color:#8a7a58}#msg{margin-top:14px;font-weight:600}
+input{font-family:inherit;font-size:.95rem;padding:10px 12px;border-radius:10px;border:1px solid #d8c8a8;width:100%;box-sizing:border-box;margin-bottom:8px}
+.divider{display:flex;align-items:center;gap:8px;color:#8a7a58;font-size:.8rem;margin:14px 0}.divider span{flex:1;height:1px;background:#e0d4ba}
+#emBtn{background:#7a1d22;color:#fff;border:none;width:100%}
 </style></head><body><div class="wrap">
 <h1>حذف الحساب والبيانات</h1>
 <p>هذه الصفحة تحذف حسابك في <b>باني الجُمل HSK4</b> وكل تقدّمك المخزّن سحابيًا نهائيًا. لا يمكن التراجع.</p>
 <div class="card">
 <div id="state">…</div>
-<button id="g" onclick="login()">تسجيل الدخول بحساب Google للتحقّق</button>
+<div id="authUI"><button id="g" onclick="login()">تسجيل الدخول بحساب Google للتحقّق</button><div class="divider"><span></span>أو بالبريد<span></span></div><input id="emEmail" type="email" inputmode="email" autocomplete="email" placeholder="البريد الإلكتروني"><input id="emPass" type="password" autocomplete="current-password" placeholder="كلمة المرور"><button id="emBtn" onclick="emlogin()">تسجيل الدخول بالبريد للتحقّق</button><div style="margin-top:8px;text-align:center"><span onclick="emreset()" style="cursor:pointer;color:#7a1d22;font-size:.8rem">نسيت كلمة المرور؟</span></div></div>
 <button id="del" style="display:none" onclick="wipe()">🗑️ حذف حسابي وكل بياناتي نهائيًا</button>
 <div id="msg"></div>
 <p style="margin-top:16px"><small>بدلاً من ذلك، يمكنك المراسلة على Man07.2012@gmail.com لطلب الحذف.</small></p>
@@ -23,12 +26,13 @@ small{color:#8a7a58}#msg{margin-top:14px;font-weight:600}
 </div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, deleteUser, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, deleteUser, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const cfg={apiKey:"AIzaSyCzaXYSuqZgZ9c7B-iwBCWx5MCSEZe_tdw",authDomain:"hsk4-study-guide.firebaseapp.com",projectId:"hsk4-study-guide"};
 const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app),provider=new GoogleAuthProvider();
 const $=id=>document.getElementById(id);
 window.login=async()=>{try{await signInWithPopup(auth,provider);}catch(e){$('msg').textContent='تعذّر تسجيل الدخول: '+((e&&e.code)||e);}};
+function emErr(x){const c=((x&&x.code)||'')+'';const m={'auth/invalid-email':'بريد غير صالح','auth/missing-password':'أدخل كلمة المرور','auth/wrong-password':'كلمة المرور غير صحيحة','auth/invalid-credential':'البريد أو كلمة المرور غير صحيحة','auth/user-not-found':'لا يوجد حساب بهذا البريد','auth/too-many-requests':'محاولات كثيرة — حاول لاحقًا','auth/network-request-failed':'تحقّق من الاتصال','auth/operation-not-allowed':'مزوّد البريد غير مفعّل في Firebase'};return m[c]||('تعذّر: '+(c||x));}window.emlogin=async()=>{const e=($('emEmail').value||'').trim(),p=($('emPass').value||'').trim();if(!e||!p){$('msg').textContent='أدخل البريد وكلمة المرور';return;}try{await signInWithEmailAndPassword(auth,e,p);}catch(x){$('msg').textContent=emErr(x);}};window.emreset=async()=>{const e=($('emEmail').value||'').trim();if(!e){$('msg').textContent='أدخل بريدك أولًا';return;}try{await sendPasswordResetEmail(auth,e);$('msg').textContent='أُرسل رابط إعادة التعيين إلى بريدك ✅';}catch(x){$('msg').textContent=emErr(x);}};
 window.wipe=async()=>{const u=auth.currentUser;if(!u)return;if(!confirm('تأكيد الحذف النهائي لحسابك وكل تقدّمك؟'))return;$('msg').textContent='جارٍ الحذف…';try{await deleteDoc(doc(db,'builderProgress',u.uid));await deleteUser(u);$('msg').textContent='تم حذف حسابك وبياناتك نهائيًا ✅';$('del').style.display='none';$('g').style.display='none';$('state').textContent='';}catch(e){const c=(e&&e.code)||'';if(/requires-recent-login/.test(c)){$('msg').textContent='لأمان الحساب، سجّل الدخول مرة أخرى ثم أعد المحاولة.';}else{$('msg').textContent='تعذّر الحذف: '+(c||e);}}};
-onAuthStateChanged(auth,u=>{if(u){$('state').innerHTML='متصل: <b>'+(u.email||'')+'</b>';$('g').style.display='none';$('del').style.display='block';}else{$('state').textContent='سجّل الدخول للتحقّق من هويتك قبل الحذف.';$('g').style.display='block';$('del').style.display='none';}});
+onAuthStateChanged(auth,u=>{if(u){$('state').innerHTML='متصل: <b>'+(u.email||'')+'</b>';$('authUI').style.display='none';$('del').style.display='block';}else{$('state').textContent='سجّل الدخول للتحقّق من هويتك قبل الحذف.';$('authUI').style.display='block';$('del').style.display='none';}});
 </script></body></html>
