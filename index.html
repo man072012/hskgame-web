@@ -521,8 +521,8 @@ ORDER.forEach(q=>{(FAMS[q.gid]=FAMS[q.gid]||{gid:q.gid,zh:q.gzh,ar:q.gar,pat:q.p
 const FAMLIST=Object.values(FAMS).sort((a,b)=>b.qs.length-a.qs.length);
 
 /* ---------- brick role ---------- */
-const ROLE_OF={'把':'b-sig','被':'b-sig','比':'b-sig','让':'b-sig','使':'b-sig','叫':'b-sig','连':'b-sig','难道':'b-sig','到底':'b-sig','究竟':'b-sig','只有':'b-sig','越':'b-sig','越来越':'b-sig','是':'b-sig','得':'b-de','正':'b-de','正在':'b-de','的':'b-attr','地':'b-prep','在':'b-prep','对':'b-prep','给':'b-prep','用':'b-prep','从':'b-prep','为':'b-prep','向':'b-prep','跟':'b-prep','着':'b-end','了':'b-end','吗':'b-end','呢':'b-end','吧':'b-end'};
-function grammarKey(chunk){const f=norm(String(chunk||''));if(!f)return null;
+const ROLE_OF={'把':'b-sig','被':'b-sig','比':'b-sig','让':'b-sig','使':'b-sig','叫':'b-sig','连':'b-sig','难道':'b-sig','到底':'b-sig','究竟':'b-sig','只有':'b-sig','越':'b-sig','越来越':'b-sig','是':'b-sig','得':'b-de','得dei':'b-de','正':'b-de','正在':'b-de','的':'b-attr','地':'b-prep','在':'b-prep','对':'b-prep','给':'b-prep','用':'b-prep','从':'b-prep','为':'b-prep','向':'b-prep','跟':'b-prep','着':'b-end','了':'b-end','吗':'b-end','呢':'b-end','吧':'b-end'};
+function grammarKey(chunk,ctx){const f=norm(String(chunk||''));if(!f)return null;
   if(f.includes('正在'))return '正在';
   if(f.includes('越来越'))return '越来越';
   if(/^难道/.test(f))return '难道';
@@ -537,6 +537,8 @@ function grammarKey(chunk){const f=norm(String(chunk||''));if(!f)return null;
   if(/叫/.test(f)&&!/叫做|名叫|大叫|叫醒|尖叫|叫声|呼叫/.test(f))return '叫';
   if(/^连/.test(f)&&!/连续|连忙|连衣裙|大连|连接|连夜/.test(f))return '连';
   if(/^越/.test(f))return '越';
+  if(/(确实|必须|真的?|也|还|就|总|可|应该|只|本|非)得([\u4e00-\u9fff]|$)/.test(f))return '得dei';
+  if(f==='得'){const c=norm(String(ctx||''));return /(确实|必须|也|还|就|真|总|只|应该|可)得/.test(c)?'得dei':'得';}
   if(/得/.test(f)&&!/觉得|舍得|获得|赢得|取得|晓得|得意|不得不|都得|得了|记得|值得|显得|免得|懂得|来得及|得到|心得|所得|非得|懒得/.test(f))return '得';
   if(/的$/.test(f))return '的';
   if(/地$/.test(f)&&!/地球|地方|地址|地铁|地图|地区|地点|当地|各地|本地|土地|草地|场地|基地/.test(f))return '地';
@@ -1044,6 +1046,7 @@ const FUNC=[
  ['使',{t:'使 — السبب (رسمية)',x:'A + 使 + B + حالة/فعل. أرسمى من 让.'}],
  ['越',{t:'越 — التدرّج',x:'越来越 + صفة، أو 越…越…'}],
  ['得',{t:'得 — مكمّل الدرجة',x:'بعد الفعل/الصفة: فعل + 得 + وصف. مع مفعول يتكرّر الفعل.'}],
+ ['得dei',{t:'得 (děi) — لا بد / يجب',x:'得 + فعل = وجوب أو ضرورة (人们确实得重视 = لا بد أن يهتمّوا). تُنطق děi، وتختلف عن 得 (de) مكمّل الدرجة مثل 说得好.'}],
  ['地',{t:'地 — تحويل لظرف',x:'صفة + 地 + الفعل (تصف كيفية الفعل).'}],
  ['正',{t:'正 — الآن',x:'正(在) + فعل: حدث مستمر.'}],
  ['在',{t:'在 — مكان / استمرار',x:'قبل المكان أو الفعل (المستمر): 在 + مكان/فعل.'}],
@@ -1065,7 +1068,7 @@ const FUNC=[
  ['连',{t:'连…都/也 — حتّى',x:'连 + المُفاجئ + 都/也 + … («حتّى …»، للتأكيد).'}]
 ];
 const FINFO=Object.fromEntries(FUNC);
-function funcOf(chunk){const k=grammarKey(chunk);return k?FINFO[k]:null;}
+function funcOf(chunk,ctx){const k=grammarKey(chunk,ctx);return k?FINFO[k]:null;}
 function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 let holdFired=false;
@@ -1095,7 +1098,7 @@ function closeOv(){const o=document.getElementById('ov');if(o)o.classList.remove
 function playAudio(src){try{const a=new Audio(src);a.play().catch(()=>{});}catch(e){}}
 
 function showPieceInfo(chunk,q){holdFired=true;
-  const r=role(chunk),f=funcOf(chunk),rc=ROLE_COL[r]||ROLE_COL['b-base'];
+  const r=role(chunk),f=funcOf(chunk,q&&q.answer),rc=ROLE_COL[r]||ROLE_COL['b-base'];
   const exact=VOCAB[chunk];
   const inner=segWords(chunk).filter((w,i,a)=>a.indexOf(w)===i&&w!==chunk);
   let h='<button class="x" data-act="close">✕</button>';
