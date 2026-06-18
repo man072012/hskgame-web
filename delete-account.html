@@ -1,0 +1,34 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>حذف الحساب — باني الجُمل HSK4</title>
+<style>
+body{margin:0;background:#f5efe0;color:#241c10;font-family:-apple-system,"Segoe UI",Tahoma,sans-serif;line-height:1.8}
+.wrap{max-width:560px;margin:0 auto;padding:36px 22px}
+h1{color:#7a1d22}.card{background:#fff;border:1px solid #e0d4ba;border-radius:14px;padding:20px;margin-top:18px}
+button{font-family:inherit;font-size:.95rem;padding:11px 16px;border-radius:10px;cursor:pointer;border:1px solid rgba(0,0,0,.15)}
+#del{background:#b01e28;color:#fff;border:none;width:100%;margin-top:12px;font-weight:700}
+#g{background:#fff;width:100%}
+small{color:#8a7a58}#msg{margin-top:14px;font-weight:600}
+</style></head><body><div class="wrap">
+<h1>حذف الحساب والبيانات</h1>
+<p>هذه الصفحة تحذف حسابك في <b>باني الجُمل HSK4</b> وكل تقدّمك المخزّن سحابيًا نهائيًا. لا يمكن التراجع.</p>
+<div class="card">
+<div id="state">…</div>
+<button id="g" onclick="login()">تسجيل الدخول بحساب Google للتحقّق</button>
+<button id="del" style="display:none" onclick="wipe()">🗑️ حذف حسابي وكل بياناتي نهائيًا</button>
+<div id="msg"></div>
+<p style="margin-top:16px"><small>بدلاً من ذلك، يمكنك المراسلة على Man07.2012@gmail.com لطلب الحذف.</small></p>
+</div>
+<p style="margin-top:20px"><a href="https://man072012.github.io/hskgame-web/">← رجوع للتطبيق</a></p>
+</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, deleteUser, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const cfg={apiKey:"AIzaSyCzaXYSuqZgZ9c7B-iwBCWx5MCSEZe_tdw",authDomain:"hsk4-study-guide.firebaseapp.com",projectId:"hsk4-study-guide"};
+const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app),provider=new GoogleAuthProvider();
+const $=id=>document.getElementById(id);
+window.login=async()=>{try{await signInWithPopup(auth,provider);}catch(e){$('msg').textContent='تعذّر تسجيل الدخول: '+((e&&e.code)||e);}};
+window.wipe=async()=>{const u=auth.currentUser;if(!u)return;if(!confirm('تأكيد الحذف النهائي لحسابك وكل تقدّمك؟'))return;$('msg').textContent='جارٍ الحذف…';try{await deleteDoc(doc(db,'builderProgress',u.uid));await deleteUser(u);$('msg').textContent='تم حذف حسابك وبياناتك نهائيًا ✅';$('del').style.display='none';$('g').style.display='none';$('state').textContent='';}catch(e){const c=(e&&e.code)||'';if(/requires-recent-login/.test(c)){$('msg').textContent='لأمان الحساب، سجّل الدخول مرة أخرى ثم أعد المحاولة.';}else{$('msg').textContent='تعذّر الحذف: '+(c||e);}}};
+onAuthStateChanged(auth,u=>{if(u){$('state').innerHTML='متصل: <b>'+(u.email||'')+'</b>';$('g').style.display='none';$('del').style.display='block';}else{$('state').textContent='سجّل الدخول للتحقّق من هويتك قبل الحذف.';$('g').style.display='block';$('del').style.display='none';}});
+</script></body></html>
