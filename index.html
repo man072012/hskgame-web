@@ -521,16 +521,38 @@ ORDER.forEach(q=>{(FAMS[q.gid]=FAMS[q.gid]||{gid:q.gid,zh:q.gzh,ar:q.gar,pat:q.p
 const FAMLIST=Object.values(FAMS).sort((a,b)=>b.qs.length-a.qs.length);
 
 /* ---------- brick role ---------- */
-function role(f){
-  if(/把|被|让|使|叫|难道|越|连(?!续)/.test(f)) return 'b-sig';
-  if(f.length<=3 && /是/.test(f)) return 'b-sig';
-  if(/得/.test(f)) return 'b-de';
-  if(/的$/.test(f)) return 'b-attr';
-  if(/^(在|对|跟|给|为|用|向|从)/.test(f)) return 'b-prep';
-  if(/^(了|吗|吧|呢|啊)$/.test(f) || (f.length<=3 && /(吗|呢)$/.test(f))) return 'b-end';
-  if(/^(是|是位|是一位|是所有人中|地球是|长江是|自信是|那是)/.test(f)) return 'b-sig';
-  return 'b-base';
+const ROLE_OF={'把':'b-sig','被':'b-sig','比':'b-sig','让':'b-sig','使':'b-sig','叫':'b-sig','连':'b-sig','难道':'b-sig','到底':'b-sig','究竟':'b-sig','只有':'b-sig','越':'b-sig','越来越':'b-sig','是':'b-sig','得':'b-de','正':'b-de','正在':'b-de','的':'b-attr','地':'b-prep','在':'b-prep','对':'b-prep','给':'b-prep','用':'b-prep','从':'b-prep','为':'b-prep','向':'b-prep','跟':'b-prep','着':'b-end','了':'b-end','吗':'b-end','呢':'b-end','吧':'b-end'};
+function grammarKey(chunk){const f=norm(String(chunk||''));if(!f)return null;
+  if(f.includes('正在'))return '正在';
+  if(f.includes('越来越'))return '越来越';
+  if(/^难道/.test(f))return '难道';
+  if(f.includes('到底')&&!/彻底/.test(f))return '到底';
+  if(f.includes('究竟'))return '究竟';
+  if(/^只有/.test(f))return '只有';
+  if(f.includes('把')&&!/把握/.test(f))return '把';
+  if(f.includes('被')&&!/被子/.test(f))return '被';
+  if(/比(?!赛|较|如|方|萨|例)/.test(f))return '比';
+  if(f.includes('让')&&!/让步/.test(f))return '让';
+  if(f.includes('使')&&!/使用|大使|使劲|即使|促使|致使/.test(f))return '使';
+  if(/叫/.test(f)&&!/叫做|名叫|大叫|叫醒|尖叫|叫声|呼叫/.test(f))return '叫';
+  if(/^连/.test(f)&&!/连续|连忙|连衣裙|大连|连接|连夜/.test(f))return '连';
+  if(/^越/.test(f))return '越';
+  if(/得/.test(f)&&!/觉得|舍得|获得|得意|不得不|记得|值得|显得|免得|懂得|来得及|得到|心得|所得|非得|懒得/.test(f))return '得';
+  if(/的$/.test(f))return '的';
+  if(/地$/.test(f)&&!/地球|地方|地址|地铁|地图|地区|地点|当地|各地|本地|土地|草地|场地|基地/.test(f))return '地';
+  if(/着$/.test(f)&&!/着急|睡着|着火|着凉|执着/.test(f))return '着';
+  if(/^(了|吗|呢|吧)$/.test(f))return f;
+  if(/吗$/.test(f)&&f.length<=4)return '吗';
+  if(/吧$/.test(f)&&f.length<=4)return '吧';
+  if(/呢$/.test(f)&&f.length<=4)return '呢';
+  if(/了$/.test(f)&&!/为了|除了|罢了|极了|多了|了解/.test(f))return '了';
+  const prep=f.match(/^(在|对|给|用|从|为|向|跟)/);
+  if(prep&&!/^在乎|^对不起|^对面|^对象|^用功|^从来|^从前|^为什么/.test(f))return prep[1];
+  if(/^正/.test(f)&&!/正确|正好|正式|正常/.test(f))return '正';
+  if(/^(那是|这是|是)/.test(f)&&f.length<=4)return '是';
+  return null;
 }
+function role(f){f=String(f||'');const k=grammarKey(f);if(k&&ROLE_OF[k])return ROLE_OF[k];if(/的$/.test(f))return 'b-attr';return 'b-base';}
 const norm=s=>s.replace(/[\s，。？?！!、,.:：]/g,'');
 
 /* ---------- audio (offline, generated) ---------- */
@@ -1035,37 +1057,15 @@ const FUNC=[
  ['呢',{t:'呢 — أداة سؤال / نبرة',x:'آخر الجملة (متابعة/استمرار).'}],
  ['吧',{t:'吧 — اقتراح / تخفيف',x:'آخر الجملة: اقتراح أو ترجيح.'}],
  ['的',{t:'的 — أداة النعت',x:'تلتصق بعد الوصف/المالك وقبل الاسم الموصوف مباشرة.'}],
- ['是',{t:'是 / 是…的 — الربط والتأكيد',x:'فاعل + 是 + خبر؛ أو إطار 是…的 لتأكيد الزمان/المكان/الطريقة.'}]
+ ['是',{t:'是 / 是…的 — الربط والتأكيد',x:'فاعل + 是 + خبر؛ أو إطار 是…的 لتأكيد الزمان/المكان/الطريقة.'}],
+ ['为',{t:'为 — لأجل / من أجل',x:'为 + الهدف أو المستفيد + فعل (为成功干杯 = نشرب نخب النجاح).'}],
+ ['向',{t:'向 — نحو / إلى',x:'向 + الجهة أو الشخص + فعل (向妈妈保证 = يَعِد أمّه).'}],
+ ['跟',{t:'跟 — مع / من',x:'跟 + الشخص + فعل (跟…打招呼 = يحيّي…، 跟…一样 = مثل…).'}],
+ ['叫',{t:'叫 — السبب / التكليف',x:'A + 叫 + B + فعل (يجعل/يأمر B أن…)، تشبه 让.'}],
+ ['连',{t:'连…都/也 — حتّى',x:'连 + المُفاجئ + 都/也 + … («حتّى …»، للتأكيد).'}]
 ];
 const FINFO=Object.fromEntries(FUNC);
-function funcOf(chunk){const f=norm(String(chunk||''));if(!f)return null;
-  if(f.includes('正在'))return FINFO['正在'];
-  if(f.includes('越来越'))return FINFO['越来越'];
-  if(/^难道/.test(f))return FINFO['难道'];
-  if(f.includes('到底')&&!/^彻底/.test(f))return FINFO['到底'];
-  if(f.includes('究竟'))return FINFO['究竟'];
-  if(/^只有/.test(f))return FINFO['只有'];
-  if(f.includes('把')&&!/把握/.test(f))return FINFO['把'];
-  if(f.includes('被')&&!/被子/.test(f))return FINFO['被'];
-  if(f.includes('比')&&!/比如|比较|鼻/.test(f))return FINFO['比'];
-  if(f.includes('让')&&!/让步/.test(f))return FINFO['让'];
-  if(f.includes('使')&&!/使用|大使|使劲|即使/.test(f))return FINFO['使'];
-  if(/^越/.test(f))return FINFO['越'];
-  if(/得/.test(f)&&!/觉得|舍得|获得|得意|不得不|记得|值得|显得|免得|懂得|来得及|得到|心得|所得|非得/.test(f))return FINFO['得'];
-  if(/的$/.test(f))return FINFO['的'];
-  if(/地$/.test(f)&&!/地球|地方|地址|地铁|地图|地区|地点|当地|各地|本地|土地|草地/.test(f))return FINFO['地'];
-  if(/着$/.test(f)&&!/着急|睡着|着火|着凉/.test(f))return FINFO['着'];
-  if(/^(了|吗|呢|吧)$/.test(f))return FINFO[f];
-  if(/吗$/.test(f)&&f.length<=4)return FINFO['吗'];
-  if(/吧$/.test(f)&&f.length<=4)return FINFO['吧'];
-  if(/呢$/.test(f)&&f.length<=4)return FINFO['呢'];
-  if(/了$/.test(f)&&!/为了|除了|罢了|极了|多了|了解/.test(f))return FINFO['了'];
-  const prep=f.match(/^(在|对|给|用|从)/);
-  if(prep&&!/^在乎|^对不起|^对面|^对象|^用功|^从来|^从前/.test(f))return FINFO[prep[1]];
-  if(/^正/.test(f)&&!/正确|正好|正式|正常/.test(f))return FINFO['正'];
-  if(/^(那是|这是|是)/.test(f)&&f.length<=4)return FINFO['是'];
-  return null;
-}
+function funcOf(chunk){const k=grammarKey(chunk);return k?FINFO[k]:null;}
 function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 let holdFired=false;
