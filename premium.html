@@ -445,7 +445,7 @@ body{
 :root{
   --stage:#f4eddc; --stage2:#ece3d0; --stage3:#fbf5e6;
   --cream:#2a2622; --cream2:#3a3026;          /* primary text -> dark ink */
-  --ink:#2a2622; --ink2:#6b6258; --ink3:#9a8e80;
+  --ink:#2a2622; --ink2:#6b6258; --ink3:#6b6258;
   --gold:#c19a3c; --gold-d:#9a7416; --seal:#c8382c; --seal-d:#9a281e;
   --jade:#2f8f6b; --azure:#2f7c9a; --clay:#b6863c; --slate:#6b6258; --plum:#8a73c9;
   --line:rgba(42,38,34,.14); --line2:rgba(42,38,34,.26);
@@ -575,6 +575,13 @@ body{background:
 .premium-hero::after{height:78px!important;background:linear-gradient(180deg,transparent, rgba(241,231,211,.92))!important}
 .premium-hero .brand-t b{text-shadow:0 1px 10px rgba(247,240,224,.85)!important;color:#2a2622!important}
 /* === END PREMIUM TOUCHES === */
+
+/* === LEGIBILITY FIXES (contrast >= AA on every background) === */
+.brand-t span,.lvl-badge b,.qbtn.mix .ic,.qbtn.mix b,.hud-rule,.combo,.cue b,.sheet h3,.explain b,.reward .r.gain,.escore .c b,.exam-cell .n,.flash-py,.ghost-slot,.pi-py,.pi-sec h5,.wc-ex .py{color:#7d5a10!important}
+.air-q .zh{color:#2a2622!important}
+.cta-fit b{color:#1b4430!important}
+.ai-keywrap small{color:#5b6b80!important}
+/* === END LEGIBILITY === */
 </style>
 </head>
 <body>
