@@ -646,6 +646,84 @@ body{background:
 .rep-body{padding:0 13px 13px;border-top:1px solid #f0e6d2}
 .rep-empty{text-align:center;color:#8a7a5e;padding:44px 16px;line-height:1.9}
 .reports-cta{background:linear-gradient(140deg,#1f3a4d,#16252f)!important}
+
+/* ===================== LUX — واجهة فخمة مرتّبة ===================== */
+.home-scroll.lux{max-width:560px;margin:0 auto;padding:0 16px calc(40px + var(--safe-b)) 16px;}
+.lux-head{text-align:center;padding:28px 8px 16px;}
+.lux-seal{display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:13px;
+  background:linear-gradient(150deg,var(--seal),var(--seal-d));box-shadow:0 6px 16px rgba(160,40,30,.26);margin-bottom:12px;}
+.lux-seal .zh{color:#fff;font-size:1.5rem;font-weight:800;line-height:1;}
+.lux-title{font-size:1.7rem;font-weight:800;color:var(--ink);margin:0;letter-spacing:.3px;}
+.lux-sub{font-size:.92rem;color:var(--gold-d);font-weight:700;margin-top:5px;letter-spacing:1px;}
+.lux-rule{width:64px;height:2px;margin:15px auto;background:linear-gradient(90deg,transparent,var(--gold),transparent);border-radius:2px;}
+.lux-tagline{font-size:.85rem;color:var(--ink2);line-height:1.85;max-width:400px;margin:0 auto;}
+
+.lux-status{display:flex;align-items:center;gap:12px;padding:13px 16px;border:1px solid var(--line2);
+  border-radius:14px;background:var(--stage3);box-shadow:var(--shadow);}
+.lux-lvl{display:flex;align-items:center;gap:11px;margin-inline-end:auto;}
+.lux-lvlnum{position:relative;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:none;
+  background:conic-gradient(var(--gold) var(--lvlpct,0%),rgba(42,38,34,.10) 0);}
+.lux-lvlnum::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--stage3);}
+.lux-lvlnum b{position:relative;z-index:1;color:var(--gold-d);font-size:1.02rem;font-weight:800;}
+.lux-lvlmeta{display:flex;flex-direction:column;line-height:1.3;}
+.lux-lvlmeta b{font-size:.92rem;color:var(--ink);}
+.lux-lvlmeta span{font-size:.72rem;color:var(--ink3);}
+.lux-stat{display:flex;align-items:center;gap:5px;color:var(--ink2);font-size:.88rem;font-weight:700;}
+.lux-stat .gi{width:16px;height:16px;opacity:.8;}
+.lux-xp{height:5px;border-radius:5px;background:rgba(42,38,34,.10);margin:11px 4px 0;overflow:hidden;}
+.lux-xp>i{display:block;height:100%;width:var(--xppct,0%);background:linear-gradient(90deg,var(--gold-d),var(--gold));border-radius:5px;transition:width .5s ease;}
+.lux-xplabel{text-align:center;font-size:.7rem;color:var(--ink3);margin-top:6px;letter-spacing:.5px;}
+
+.lux-primary{margin-top:18px;border:1px solid var(--gold);border-radius:16px;padding:17px 18px;
+  background:linear-gradient(160deg,#fbf3df,var(--stage3));box-shadow:0 10px 26px rgba(193,154,60,.13);}
+.lux-primary-top{display:flex;align-items:center;gap:12px;}
+.lux-primary-txt{margin-inline-end:auto;}
+.lux-primary-txt b{display:block;font-size:1.08rem;color:var(--ink);}
+.lux-primary-txt span{display:block;font-size:.8rem;color:var(--ink2);margin-top:4px;line-height:1.6;}
+.lux-go{flex:none;border:0;border-radius:11px;padding:12px 26px;font-family:inherit;font-weight:800;font-size:.98rem;
+  color:#fff;background:linear-gradient(150deg,var(--gold),var(--gold-d));cursor:pointer;box-shadow:0 5px 14px rgba(154,116,22,.28);}
+.lux-go:active{transform:translateY(1px);}
+.lux-metrics{display:flex;gap:20px;margin-top:14px;padding-top:13px;border-top:1px solid var(--line);}
+.lux-metrics span{font-size:.78rem;color:var(--ink3);}
+.lux-metrics b{color:var(--gold-d);font-size:.96rem;margin-inline-end:4px;}
+
+.lux-sec{display:flex;align-items:baseline;gap:9px;margin:26px 4px 14px;}
+.lux-sec b{font-size:1.02rem;color:var(--ink);font-weight:800;}
+.lux-sec .zh{font-size:.82rem;color:var(--gold-d);}
+.lux-sec::after{content:"";flex:1;height:1px;background:var(--line2);margin-inline-start:4px;}
+.lux-sec.quiet b{color:var(--ink2);font-size:.92rem;}
+.lux-sec.quiet .zh{color:var(--ink3);}
+
+.lux-modes{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.lux-tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:start;
+  border:1px solid var(--line2);border-radius:14px;padding:15px 14px 14px;background:var(--stage3);cursor:pointer;
+  font-family:inherit;box-shadow:var(--shadow);transition:transform .12s ease;}
+.lux-tile:active{transform:translateY(1px);}
+.lux-tile.featured{border-color:var(--gold);background:linear-gradient(160deg,#fbf4e1,var(--stage3));}
+.lux-ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;margin-bottom:7px;background:rgba(193,154,60,.12);}
+.lux-ic .gi{width:20px;height:20px;}
+.lux-tile b{font-size:.96rem;color:var(--ink);}
+.lux-tile small{font-size:.73rem;color:var(--ink3);line-height:1.5;}
+.lux-badge{position:absolute;top:12px;inset-inline-end:12px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;
+  background:var(--seal);color:#fff;font-size:.72rem;font-weight:800;display:grid;place-items:center;}
+
+#worlds{display:flex;flex-direction:column;gap:11px;}
+
+.lux-set{border:1px solid var(--line2);border-radius:14px;padding:14px 15px;background:var(--stage3);margin-bottom:11px;}
+.lux-set-row{display:flex;align-items:center;gap:12px;}
+.lux-set-txt{margin-inline-end:auto;}
+.lux-set-txt b{display:block;font-size:.92rem;color:var(--ink);}
+.lux-set-txt span{display:block;font-size:.74rem;color:var(--ink3);margin-top:3px;line-height:1.6;}
+.lux-set .ai-keywrap{margin-top:12px;}
+.lux-set .ai-keywrap input{width:100%;border:1px solid var(--line2);border-radius:9px;padding:10px 12px;background:#fff;color:var(--ink);font-family:inherit;font-size:.82rem;box-sizing:border-box;}
+.lux-set .ai-keywrap small{display:block;font-size:.7rem;color:var(--ink3);margin-top:7px;line-height:1.6;}
+.lux-auth{font-size:.82rem;line-height:1.8;color:var(--ink2);}
+.lux-footrow{display:flex;justify-content:center;gap:22px;margin-top:8px;flex-wrap:wrap;}
+.lux-link{background:none;border:0;font-family:inherit;font-size:.76rem;color:var(--ink3);cursor:pointer;text-decoration:none;padding:4px;}
+.lux-link:hover{color:var(--gold-d);}
+
+.hero-chips,.legend-card,.reports-cta,#reportsCta{display:none!important;}
+
 </style>
 </head>
 <body>
@@ -657,115 +735,82 @@ body{background:
 
 <!-- ================= HOME ================= -->
 <section class="screen on" id="home">
-  <div class="home-scroll">
-    <div class="hero premium-hero">
-      <div class="brand">
-        <span class="seal"><span class="zh">序</span></span>
-        <span class="brand-t"><b>باني الجُمل</b><span class="zh">构句大师 · HSK4 排序</span></span>
-      </div>
-      <p class="tagline">جلسات قصيرة تبني ترتيب الجملة الصينية بثقة: اكتشاف، تركيب، ثم مراجعة ذكية لما يحتاج تثبيت.</p>
-      <div class="hero-chips">
-        <span class="hero-chip">HSK4</span>
-        <span class="hero-chip">SRS</span>
-        <span class="hero-chip">ضع ثم اشرح</span>
-      </div>
-    </div>
+  <div class="home-scroll lux">
+    <header class="lux-head">
+      <span class="lux-seal"><span class="zh">序</span></span>
+      <h1 class="lux-title">باني الجُمل</h1>
+      <div class="lux-sub zh">构句大师 · HSK4 排序</div>
+      <div class="lux-rule"></div>
+      <p class="lux-tagline">جلسات قصيرة تبني ترتيب الجملة الصينية بثقة — اكتشاف، تركيب، ثم مراجعة ذكية.</p>
+    </header>
 
-    <div class="player">
-      <div class="player-top">
-        <div class="lvl">
-          <div class="lvl-badge" id="lvlBadge"><b id="lvlNum">1</b></div>
-          <div class="lvl-meta"><b id="lvlTitle">مبتدئ البناء</b><span id="lvlSub">المستوى 1</span></div>
-        </div>
-        <div class="stats">
-          <div class="stat fire" title="أيام متتالية"><span class="i"><i class="gi i-flame"></i></span><span class="num" id="streak">0</span></div>
-          <div class="stat" title="عملات"><span class="i"><i class="gi i-coin"></i></span><span class="num" id="coins">5</span></div>
-        </div>
+    <div class="lux-status">
+      <div class="lux-lvl">
+        <span class="lux-lvlnum" id="lvlBadge"><b id="lvlNum">1</b></span>
+        <span class="lux-lvlmeta"><b id="lvlTitle">مبتدئ البناء</b><span id="lvlSub">المستوى 1</span></span>
       </div>
-      <div class="xpbar"><i id="xpFill"></i></div>
-      <div class="xp-label"><span class="num" id="xpNow">0</span> / <span class="num" id="xpNext">100</span> XP</div>
+      <div class="lux-stat" title="أيام متتالية"><i class="gi i-flame"></i><span class="num" id="streak">0</span></div>
+      <div class="lux-stat" title="عملات"><i class="gi i-coin"></i><span class="num" id="coins">5</span></div>
     </div>
+    <div class="lux-xp"><i id="xpFill"></i></div>
+    <div class="lux-xplabel"><span class="num" id="xpNow">0</span> / <span class="num" id="xpNext">100</span> XP</div>
 
-    <div class="daily-card">
-      <div class="daily-top">
-        <div class="daily-title">
+    <div class="lux-primary">
+      <div class="lux-primary-top">
+        <div class="lux-primary-txt">
           <b id="dailyAction">جلسة اليوم</b>
-          <span id="dailySub">اختيار البداية الأنسب حسب تقدمك الحالي.</span>
+          <span id="dailySub">اختيار البداية الأنسب حسب تقدّمك الحالي.</span>
         </div>
-        <button class="daily-btn" id="dailyActionBtn" onclick="startRecommended()">ابدأ</button>
+        <button class="lux-go" id="dailyActionBtn" onclick="startRecommended()">ابدأ</button>
       </div>
-      <div class="daily-metrics">
-        <div class="daily-metric"><b class="num" id="dailyDue">0</b><span>مستحق</span></div>
-        <div class="daily-metric"><b class="num" id="dailyWeak">0</b><span>أخطاء</span></div>
-        <div class="daily-metric"><b class="num" id="dailyReady">0</b><span>جاهزة</span></div>
+      <div class="lux-metrics">
+        <span><b class="num" id="dailyDue">0</b>مستحق</span>
+        <span><b class="num" id="dailyWeak">0</b>أخطاء</span>
+        <span><b class="num" id="dailyReady">0</b>جاهزة</span>
       </div>
     </div>
 
-    <div class="ai-card">
-      <div class="ai-card-top">
-        <div><b><i class="gi i-spark"></i> الأداء الذكي</b><span>تحليل استقرائي استدلالي عميق بالذكاء الاصطناعي في نهاية كل جولة</span></div>
+    <div class="lux-sec"><b>التدريبات</b><span class="zh">练习</span></div>
+    <div class="lux-modes">
+      <button class="lux-tile featured" onclick="startFit({mode:'mix'})">
+        <span class="lux-ic"><i class="gi i-puzzle"></i></span>
+        <b>الوضع التمهيدي</b><small>قطع تتشابك بالشكل — تعلّم باللمس</small>
+      </button>
+      <button class="lux-tile" onclick="startSession({mode:'mix'})">
+        <span class="lux-ic"><i class="gi i-shuffle"></i></span>
+        <b>تحدّي سريع</b><small>١٠ جُمل عشوائية</small>
+      </button>
+      <button class="lux-tile" onclick="startSession({mode:'weak'})">
+        <span class="lux-ic"><i class="gi i-target"></i></span>
+        <span class="lux-badge num" id="weakCnt">0</span>
+        <b>راجع أخطائي</b><small>الجُمل اللي غلطت فيها</small>
+      </button>
+      <button class="lux-tile" onclick="showPics()">
+        <span class="lux-ic"><i class="gi i-image"></i></span>
+        <b>بطاقات الصور</b><small>看图 · الكلمات 96–100</small>
+      </button>
+    </div>
+
+    <div class="lux-sec"><b>عوالم القواعد</b><span class="zh">语法世界</span></div>
+    <div class="worlds" id="worlds"></div>
+
+    <div class="lux-sec quiet"><b>الإعدادات</b><span class="zh">设置</span></div>
+    <div class="lux-set">
+      <div class="lux-set-row">
+        <div class="lux-set-txt"><b><i class="gi i-spark"></i> الأداء الذكي</b><span>تحليل عميق بالذكاء الاصطناعي في نهاية كل جولة</span></div>
         <label class="ai-sw"><input type="checkbox" id="aiToggle" onchange="onAiToggle(this.checked)"><span class="ai-sl"></span></label>
       </div>
       <div id="aiKeyWrap" class="ai-keywrap hidden">
         <input id="aiKeyInput" type="password" placeholder="DashScope key (sk-…)" oninput="onAiKey(this.value)" autocomplete="off" spellcheck="false">
-        <small>يُحفظ على جهازك فقط ولا يُرفع للسحابة. احصل عليه من dashscope.console.aliyun.com</small>
+        <small>يُحفظ على جهازك فقط. احصل عليه من dashscope.console.aliyun.com</small>
       </div>
     </div>
-
-    <button class="cta-fit reports-cta" id="reportsCta" onclick="showReports()">
-      <span class="ic">📄</span>
-      <span><b>تقاريري</b><br><small>سجلّ جولاتك — اعرضها وحمّلها كوثيقة</small></span>
-    </button>
-    <button class="cta-fit" id="fitCta" onclick="startFit({mode:'mix'})">
-      <span class="ic"><i class="gi i-puzzle"></i></span>
-      <span><b>ابدأ هنا · الوضع التمهيدي</b><br><small>قطع تتشابك بالشكل — تعلّم الترتيب باللمس</small></span>
-      <span class="badge">جديد</span>
-    </button>
-
-    <div class="sec-h"><b>العب الآن</b><span class="zh">开始</span></div>
-    <div class="quick">
-      <button class="qbtn mix" onclick="startSession({mode:'mix'})">
-        <span class="ic"><i class="gi i-shuffle"></i></span>
-        <span><b>تحدّي سريع</b><br><small>١٠ جُمل عشوائية</small></span>
-      </button>
-      <button class="qbtn weak" onclick="startSession({mode:'weak'})">
-        <span class="ic"><i class="gi i-target"></i></span>
-        <span class="cnt num" id="weakCnt">0</span>
-        <span><b>راجع أخطائي</b><br><small>الجُمل اللي غلطت فيها</small></span>
-      </button>
+    <div id="authBox" class="lux-set">
+      <div id="authState" class="lux-auth">…</div>
     </div>
-
-    <div class="sec-h"><b>عوالم القواعد</b><span class="zh">语法世界</span></div>
-    <div class="worlds" id="worlds"></div>
-
-    <div class="legend-card">
-      <h4>مفتاح ألوان القطع</h4>
-      <p>كل قطعة ملوّنة حسب وظيفتها النحوية — هذا هو دليلك للترتيب الصحيح.</p>
-      <div class="legend-row">
-        <span class="lg"><i class="b-sig" style="background:#e3ad44"></i>إشارة (把/被/是/比/让…)</span>
-        <span class="lg"><i style="background:#39a06d"></i>‍的 نعت (قبل الاسم)</span>
-        <span class="lg"><i style="background:#3a8fb0"></i>‍得 مكمّل (بعد الفعل)</span>
-        <span class="lg"><i style="background:#cd7a4c"></i>ظرف 在/对 (قبل الفعل)</span>
-        <span class="lg"><i style="background:#808d9c"></i>نهاية 了/吗/吧</span>
-        <span class="lg"><i style="background:#e9dcc2"></i>كلمة عادية</span>
-      </div>
-    </div>
-
-    <div class="quick" style="margin-top:14px">
-      <button class="qbtn" style="background:rgba(255,255,255,.04)" onclick="showPics()">
-        <span class="ic"><i class="gi i-image"></i></span><span><b>بطاقات الصور</b><br><small>看图 · الكلمات 96–100</small></span>
-      </button>
-      <button class="qbtn" style="background:rgba(255,255,255,.04)" onclick="confirmReset()">
-        <span class="ic"><i class="gi i-refresh"></i></span><span><b>تصفير التقدّم</b><br><small>ابدأ من جديد</small></span>
-      </button>
-    </div>
-    <div id="authBox" style="margin-top:14px;border:1px solid rgba(255,255,255,.10);border-radius:12px;padding:12px 14px;background:rgba(255,255,255,.03)">
-      <div id="authState" style="font-size:.84rem;line-height:1.7;color:var(--ink2,#d8c7b0)">…</div>
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button onclick="exportProgress()" style="flex:1;padding:9px;border:1px solid rgba(255,255,255,.14);border-radius:9px;background:rgba(255,255,255,.04);color:inherit;font-family:inherit;font-size:.78rem;cursor:pointer">⬇ تصدير</button>
-        <label style="flex:1;padding:9px;border:1px solid rgba(255,255,255,.14);border-radius:9px;background:rgba(255,255,255,.04);color:inherit;text-align:center;cursor:pointer;font-size:.78rem">⬆ استيراد<input type="file" accept="application/json,.json" onchange="importProgress(event)" style="display:none"></label>
-      </div>
-      <div style="margin-top:9px;text-align:center"><a href="https://man072012.github.io/hskgame-web/privacy.html" target="_blank" rel="noopener" style="color:#8fd0ea;font-size:.74rem;text-decoration:none">📜 الاتفاقية وسياسة الخصوصية</a></div>
+    <div class="lux-footrow">
+      <button class="lux-link" onclick="confirmReset()">تصفير التقدّم</button>
+      <a class="lux-link" href="https://man072012.github.io/hskgame-web/privacy.html" target="_blank" rel="noopener">الاتفاقية وسياسة الخصوصية</a>
     </div>
   </div>
 </section>
@@ -828,13 +873,7 @@ body{background:
 </section>
 
 <!-- ================= REPORTS ================= -->
-<section class="screen" id="reports">
-  <div class="pic-head">
-    <button class="icon-btn" onclick="goHome()">‹</button>
-    <div><b>تقاريري</b> <span class="zh">我的报告</span></div>
-  </div>
-  <div class="pic-scroll" id="reportsList"></div>
-</section>
+
 
 <!-- ================= SHAPE-FIT (تمهيدي) ================= -->
 <section class="screen" id="fit">
@@ -1448,7 +1487,6 @@ async function runEndReport(){
   var struggled=f.nearList.length+f.scatterList.length;
   var willAI=aiMode()&&aiKey()&&navigator.onLine&&struggled;
   box.innerHTML=insightHTML(f,!willAI);
-  var rid=recordReport(f,null);
   if(!struggled)return;
   if(!aiMode()){box.insertAdjacentHTML('beforeend','<div class="air-hint">فعّل «الأداء الذكي» 🧠 في الرئيسية عشان نصائح أعمق من مدرّبك.</div>');return;}
   if(!aiKey()){box.insertAdjacentHTML('beforeend','<div class="air-hint">🔑 أضف مفتاح DashScope في «الأداء الذكي» لتفعيل النصائح العميقة.</div>');return;}
@@ -1459,7 +1497,6 @@ async function runEndReport(){
     t=t.replace(/```json|```/g,'').trim();var mm=t.match(/\{[\s\S]*\}/);
     var data=JSON.parse(mm?mm[0]:t);
     load.remove();box.insertAdjacentHTML('beforeend',aiReportHTML(data,f));
-    updateReportAI(rid,data);
   }catch(e){
     load.remove();
     var rl=collectRules(f),fb='';
@@ -1467,71 +1504,6 @@ async function runEndReport(){
     box.insertAdjacentHTML('beforeend',fb+'<div class="air-hint">تعذّر جلب النصائح العميقة ('+esc(e.message||'خطأ')+') — اعتمد القواعد فوق.</div>');
   }
 }
-
-/* ===== سجلّ التقارير + تصدير وثيقة ===== */
-var REP_LS='hsk4b_reports';
-function loadReports(){try{return JSON.parse(localStorage.getItem(REP_LS)||'[]');}catch(e){return [];}}
-function saveReports(a){try{localStorage.setItem(REP_LS,JSON.stringify(a.slice(-60)));}catch(e){}}
-function recordReport(f,ai){
-  var near=f.nearList.map(function(r){var c=ordTexts(r.q),d=r._diff;return {ans:r.q.answer,a:c[d.ia],b:c[d.ib]};});
-  var scat=f.scatterList.map(function(r){return {ans:r.q.answer,chain:ordTexts(r.q)};});
-  var mode=(typeof T!=='undefined'&&T&&T.opt&&T.opt.mode)||'';
-  var rec={id:Date.now(),date:new Date().toLocaleString('ar-EG'),ok:f.ok,total:f.total,mode:mode,near:near,scatter:scat,rules:collectRules(f),ai:ai||null};
-  var a=loadReports();a.push(rec);saveReports(a);return rec.id;
-}
-function updateReportAI(id,ai){var a=loadReports();for(var i=a.length-1;i>=0;i--){if(a[i].id===id){a[i].ai=ai;break;}}saveReports(a);}
-function clearReports(){if(confirm('حذف كل التقارير؟')){saveReports([]);renderReports();}}
-function reportBody(rec){
-  var h='<div class="rep-meta">📅 '+esc(rec.date)+' · ضبطت '+rec.ok+' من '+rec.total+'</div>';
-  if(rec.near&&rec.near.length){h+='<div class="ins-sec"><div class="ins-st">قريب جدًّا — بس مكان كلمتين:</div>';
-    rec.near.forEach(function(n){h+='<div class="ins-q"><span class="zh" dir="ltr">'+esc(n.ans)+'</span> <span class="ins-fix">👈 خلّ «'+esc(n.a)+'» قبل «'+esc(n.b)+'».</span></div>';});h+='</div>';}
-  if(rec.scatter&&rec.scatter.length){h+='<div class="ins-sec"><div class="ins-st">محتاجة إعادة ترتيب:</div>';
-    rec.scatter.forEach(function(s){h+='<div class="ins-q"><span class="zh" dir="ltr">'+esc(s.ans)+'</span> <span class="ins-fix">👈 رتّبها: <span dir="ltr">'+(s.chain||[]).map(function(x){return '«'+esc(x)+'»';}).join(' › ')+'</span></span></div>';});h+='</div>';}
-  var R=(rec.ai&&rec.ai.rules&&rec.ai.rules.length)?rec.ai.rules:(rec.rules||[]);
-  if(R.length){h+='<div class="ins-sec"><div class="ins-st">قواعد تثبت معك:</div><div class="ins-rules">';
-    R.forEach(function(t){h+='<div class="ins-rule">💡 '+esc(typeof t==='string'?t:(t.tip||t.rule||''))+'</div>';});h+='</div></div>';}
-  if(rec.ai&&rec.ai.cheer)h+='<div class="air-mot">✨ '+esc(rec.ai.cheer)+'</div>';
-  if((!rec.near||!rec.near.length)&&(!rec.scatter||!rec.scatter.length))h+='<div class="ins ok">🎉 جولة نظيفة — رتّبت الجُمل صح.</div>';
-  return h;
-}
-function renderReports(){
-  var box=document.getElementById('reportsList');if(!box)return;
-  var a=loadReports().slice().reverse();
-  if(!a.length){box.innerHTML='<div class="rep-empty">ما عندك تقارير بعد. خلّص جولة وبيظهر تقريرها هنا 📄</div>';return;}
-  var h='<div class="rep-tools"><button class="btn ghost" onclick="downloadAllReports()">⬇️ تحميل الكل كوثيقة</button><button class="btn ghost" onclick="clearReports()">🗑️ حذف الكل</button></div>';
-  a.forEach(function(r){
-    h+='<div class="rep-card"><div class="rep-head" onclick="toggleReport('+r.id+')">'+
-       '<div class="rep-when"><b>'+esc(r.date)+'</b><br><small>ضبطت '+r.ok+' من '+r.total+(r.ai?' · 🧠':'')+'</small></div>'+
-       '<button class="rep-dl" onclick="event.stopPropagation();downloadReport('+r.id+')">⬇️ تحميل</button></div>'+
-       '<div class="rep-body" id="rep-'+r.id+'" style="display:none">'+reportBody(r)+'</div></div>';
-  });
-  box.innerHTML=h;
-}
-function toggleReport(id){var e=document.getElementById('rep-'+id);if(e)e.style.display=(e.style.display==='none')?'':'none';}
-function showReports(){go('reports');renderReports();}
-function reportDocHTML(recs){
-  var title='تقارير ترتيب الجُمل — HSK4 构句大师';
-  var body=recs.map(function(r){return '<section class="doc-rep">'+reportBody(r)+'</section>';}).join('');
-  return '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+title+'</title><style>'+
-    'body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#faf6ee;color:#2a2418;margin:0;padding:18px;line-height:1.75}'+
-    'h1{font-size:1.15rem;color:#7a5a2a;margin:0 0 14px}.doc-rep{background:#fff;border:1px solid #e8dcc2;border-radius:12px;padding:14px 16px;margin:0 0 16px}'+
-    '.rep-meta{font-size:.85rem;color:#6b5942;margin-bottom:10px;font-weight:700}.ins-sec{margin:12px 0 4px}'+
-    '.ins-st{font-size:.85rem;font-weight:800;color:#6b5942;margin-bottom:8px}'+
-    '.ins-q{background:#fffdf8;border:1px solid #ecdfc4;border-radius:10px;padding:7px 10px;margin:6px 0}'+
-    '.zh{font-family:"PingFang SC","Noto Sans CJK SC",sans-serif;direction:ltr;font-size:1rem;color:#1a1a1a}'+
-    '.ins-fix{font-size:.86rem;color:#155235;font-weight:700}.ins-rule{font-size:.85rem;color:#574009;margin:5px 0}'+
-    '.air-mot{margin-top:10px;font-weight:700;color:#7a5a2a}.ins.ok{color:#1f7048;font-weight:700}</style></head><body><h1>'+title+'</h1>'+body+'</body></html>';
-}
-function dlDoc(html,name){
-  if(typeof AndroidExport!=='undefined'&&AndroidExport&&AndroidExport.saveFile){try{AndroidExport.saveFile(name,html);toast('تم الحفظ في «التنزيلات» ✓');return;}catch(e){}}
-  try{var blob=new Blob([html],{type:'text/html;charset=utf-8'});var url=URL.createObjectURL(blob);
-    var a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();
-    setTimeout(function(){URL.revokeObjectURL(url);a.remove();},1200);}
-  catch(e){toast('تعذّر التحميل على هذا الجهاز');}
-}
-function downloadReport(id){var r=loadReports().filter(function(x){return x.id===id;});if(!r.length)return;dlDoc(reportDocHTML(r),'HSK4-تقرير-'+id+'.html');}
-function downloadAllReports(){var a=loadReports().slice().reverse();if(!a.length)return;dlDoc(reportDocHTML(a),'HSK4-تقاريري.html');}
-
 
 function endSession(){
   go('end');
@@ -1876,8 +1848,7 @@ renderHome();
 <script>window.addEventListener('error',function(ev){try{if(typeof toast==='function')toast('⚠ خطأ: '+(ev.message||(ev.error&&ev.error.message)||'غير معروف'));}catch(_){}});window.addEventListener('unhandledrejection',function(ev){try{if(typeof toast==='function')toast('⚠ خطأ غير ممسوك');}catch(_){}});</script>
 <script>
 const PFX_KEY='hsk4builder_v1';
-function exportProgress(){let v='';try{v=localStorage.getItem(PFX_KEY)||'';}catch(e){}const blob=new Blob([v||'{}'],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='banialjumal-progress-'+new Date().toISOString().slice(0,10)+'.json';a.click();}
-function importProgress(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const o=JSON.parse(e.target.result);if(o&&typeof o==='object'){localStorage.setItem(PFX_KEY,JSON.stringify(o));alert('تم الاستيراد \u2705 \u2014 سيُعاد التحميل');location.reload();}else throw 0;}catch(err){alert('ملف غير صالح \u274C');}};r.readAsText(f);}
+
 window.scheduleCloudPush=window.scheduleCloudPush||function(){};
 function _updateAuthUI(){try{var u=(window.fbUser&&window.fbUser())||null;var el=document.getElementById('authState');if(!el)return;if(u){el.innerHTML='<span style="color:#5fd07a">\u25CF</span> متصل: <b>'+(u.email||u.name||'مستخدم')+'</b> \u2014 يُحفظ سحابيًا تلقائيًا <button onclick="window.fbSignOut&&fbSignOut()" style="margin-inline-start:8px;padding:4px 10px;border:1px solid rgba(255,255,255,.18);border-radius:7px;background:rgba(255,255,255,.06);color:inherit;cursor:pointer;font-family:inherit;font-size:.74rem">خروج</button>';}else{el.innerHTML='<button onclick="window.fbSignIn&&fbSignIn()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border:1px solid rgba(0,0,0,.15);border-radius:10px;background:#fff;color:#222;cursor:pointer;font-family:inherit;font-weight:700"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09A6.6 6.6 0 0 1 5.49 12c0-.73.13-1.43.35-2.09V7.07H2.18A11 11 0 0 0 1 12c0 1.78.43 3.45 1.18 4.93z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg> تسجيل الدخول بحساب Google</button><div style="display:flex;align-items:center;gap:8px;margin:11px 0 8px;color:#a89;font-size:.72rem"><span style="flex:1;height:1px;background:rgba(255,255,255,.12)"></span>أو بالبريد<span style="flex:1;height:1px;background:rgba(255,255,255,.12)"></span></div><input id="emEmail" type="email" inputmode="email" autocomplete="email" placeholder="البريد الإلكتروني" style="width:100%;padding:9px 11px;margin-bottom:7px;border:1px solid rgba(255,255,255,.16);border-radius:9px;background:rgba(255,255,255,.06);color:#fff;font-family:inherit;font-size:.82rem"><input id="emPass" type="password" autocomplete="current-password" placeholder="كلمة المرور (٦+ أحرف)" style="width:100%;padding:9px 11px;border:1px solid rgba(255,255,255,.16);border-radius:9px;background:rgba(255,255,255,.06);color:#fff;font-family:inherit;font-size:.82rem"><div style="display:flex;gap:8px;margin-top:8px"><button onclick="window.fbEmailSignIn&&fbEmailSignIn()" style="flex:1;padding:9px;border:none;border-radius:9px;background:#c8a24b;color:#1a1206;font-family:inherit;font-weight:700;cursor:pointer;font-size:.8rem">تسجيل الدخول</button><button onclick="window.fbEmailSignUp&&fbEmailSignUp()" style="flex:1;padding:9px;border:1px solid rgba(255,255,255,.16);border-radius:9px;background:rgba(255,255,255,.06);color:inherit;font-family:inherit;font-weight:600;cursor:pointer;font-size:.8rem">إنشاء حساب</button></div><div style="margin-top:8px;text-align:center"><span onclick="window.fbReset&&fbReset()" style="cursor:pointer;color:#8fd0ea;font-size:.72rem">نسيت كلمة المرور؟</span></div><div style="margin-top:8px;color:#a89;font-size:.72rem;text-align:center">اختياري — لحفظ تقدّمك عبر الأجهزة. بتسجيلك توافق على الاتفاقية والخصوصية.</div>';}}catch(e){}}
 window._updateAuthUI=_updateAuthUI;document.addEventListener('DOMContentLoaded',_updateAuthUI);
