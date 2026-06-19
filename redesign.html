@@ -383,6 +383,13 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .air-load{margin-top:10px;font-size:.85rem;color:#9fd0ff;text-align:center;padding:8px}
 .air-hint{margin-top:10px;font-size:.78rem;color:#8fa3c8;line-height:1.7;background:#0e1830;border:1px dashed #34507e;border-radius:10px;padding:9px 11px}
 
+
+.ins-open{font-size:.9rem;color:#5b4a36;margin:4px 0 12px;line-height:1.75}
+.ins-sec{margin:12px 0 4px}
+.ins-st{font-size:.82rem;font-weight:800;color:#6b5942;margin-bottom:8px}
+.ins-fix{font-size:.86rem;color:#1f7048;margin-top:5px;line-height:1.75;font-weight:700}
+.ins-chain{font-size:1rem;font-weight:800;margin-top:5px;letter-spacing:.5px;color:#2f2415}
+.ins-rule{font-size:.84rem;color:#9a6c12;margin-top:5px;line-height:1.75}
 </style>
 </head>
 <body>
@@ -815,7 +822,7 @@ function renderHearts(){const h=document.getElementById('hearts');h.innerHTML=''
 
 function renderQ(){
   const q=T.qs[T.idx];T.cur=q;T.placed=[];T.tray=shuffle(q.frags.map((f,i)=>({id:i,t:f,r:role(f)})));
-  T.hints=0;T.wrong=0;
+  T.hints=0;T.wrong=0;T.curFirstWrong=null;
   T.level=levelOf(q.gid); T.noColor=(T.level>=2);
   const anch=anchorFrag(q);T.anchorId=anch?anch.id:null;T.anchorKey=anch?anch.key:null;
   T.phase=(S.flags.anchor&&T.level>=1&&T.anchorId!=null)?'anchor':'build';
@@ -878,7 +885,7 @@ function checkAnswer(){
   const built=norm(T.placed.map(x=>x.t).join(''));
   if(built===norm(T.cur.answer)){solveOK();}
   else{
-    T.wrong++;T.combo=0;
+    T.wrong++;T.combo=0;if(!T.curFirstWrong)T.curFirstWrong=T.placed.map(function(x){return x.t;});
     // count correct-in-place prefix-style: how many positions match the answer order
     let good=0;const target=T.cur.answer;let acc='';
     for(const x of T.placed){acc+=norm(x.t);if(target.indexOf(acc)===0)good=acc.length; }
@@ -906,7 +913,7 @@ function solveOK(){
   document.getElementById('hintBtn').classList.add('hidden');
   // scoring
   let stars=3;if(T.hints>0||T.wrong===1)stars=2;if(T.wrong>=2)stars=1;
-  T.combo++;T.correct++;if(T.results)T.results.push({q:q,ok:true});
+  T.combo++;T.correct++;if(T.results)T.results.push({q:q,ok:true,placed:T.curFirstWrong||null});
   const base=10,comboBonus=Math.min(T.combo-1,5)*2,starBonus=(stars-1)*4;
   const noSupBonus=(S.flags.fade&&(T.level||0)>=2)?6:0;
   const gained=base+comboBonus+starBonus+noSupBonus;T.xp+=gained;
@@ -925,7 +932,7 @@ function solveOK(){
 }
 function revealAndContinue(){
   const q=T.cur;
-  if(T.results)T.results.push({q:q,ok:false,placed:(T.placed||[]).map(function(x){return x.t;})});
+  if(T.results)T.results.push({q:q,ok:false,placed:T.curFirstWrong||(T.placed||[]).map(function(x){return x.t;})});
   // auto-place correct order to show answer
   const order=[];let acc='';const tg=norm(q.answer);
   const avail=q.frags.map((f,i)=>({id:i,t:f,r:role(f)}));
@@ -1002,71 +1009,104 @@ function ordTexts(q){
 }
 /* compare student's placed texts vs correct order -> near-miss + Arabic description */
 function diffOrder(q,placed){
-  if(!placed||placed.length!==q.frags.length)return {nearMiss:false,desc:''};
+  if(!placed||placed.length!==q.frags.length)return {nearMiss:false,scattered:false,desc:''};
   var corr=ordTexts(q),diff=[];
   for(var i=0;i<corr.length;i++)if(norm(placed[i])!==norm(corr[i]))diff.push(i);
-  if(diff.length===0)return {nearMiss:false,desc:''};
+  if(diff.length===0)return {nearMiss:false,scattered:false,desc:''};
   if(diff.length===2){var a=diff[0],b=diff[1];
     if(norm(placed[a])===norm(corr[b])&&norm(placed[b])===norm(corr[a])){
-      var adj=Math.abs(a-b)===1;
-      return {nearMiss:true,desc:'بدّلت ترتيب \u300c'+corr[a]+'\u300d و \u300c'+corr[b]+'\u300d'+(adj?' (متجاورتان)':'')+' — والباقي صحيح'};
+      return {nearMiss:true,scattered:false,ia:a,ib:b};
     }}
-  return {nearMiss:false,desc:'الترتيب مشتّت — '+diff.length+' قطع في غير موضعها'};
+  return {nearMiss:false,scattered:true,n:diff.length};
+}
+/* concrete positional rules derived from the CORRECT order (offline, always available) */
+function posRules(q){
+  var corr=ordTexts(q),out=[];
+  for(var i=0;i<corr.length;i++){
+    var fr=corr[i],k=grammarKey(fr,q.answer),r=role(fr);
+    if(r==='b-end'&&i===corr.length-1){out.push('\u300c'+fr+'\u300d مكانها آخر الجملة.');continue;}
+    if(r==='b-prep'&&i===0){out.push('\u300c'+fr+'\u300d تجي في بداية الجملة.');continue;}
+    if(k==='把'||k==='被'){out.push('بعد \u300c'+fr+'\u300d يجي الشيء المتأثّر ثم الفعل \u2014 مو الفعل طول.');continue;}
+    if(k==='的'&&i<corr.length-1){out.push('\u300c'+fr+'\u300d تلتصق قبل الاسم: \u300c'+fr+'\u300d+\u300c'+corr[i+1]+'\u300d.');continue;}
+    if(k==='得'){out.push('بعد \u300c'+fr+'\u300d يجي وصف الدرجة/النتيجة.');continue;}
+    if(k==='比'&&i<corr.length-1){out.push('بعد \u300c'+fr+'\u300d يجي الطرف الثاني ثم الصفة.');continue;}
+  }
+  return out.slice(0,2);
+}
+function openerLine(f){
+  if(f.nearList.length&&!f.scatterList.length)return 'كنت قريب \u2014 أغلب اللي صار مجرّد تبديل مكان. عدّلها وتضبط:';
+  if(!f.nearList.length&&f.scatterList.length)return 'في جمل ترتيبها محتاج تركيز. خلّنا نفكّكها بقواعد موضع تثبت معك:';
+  return 'بعض الجمل كانت قريبة جدًّا وبعضها محتاجة ترتيب \u2014 هذي خريطتك:';
 }
 function sessionFacts(){
   var res=(typeof T!=='undefined'&&T&&T.results)||[];
   var total=res.length,ok=res.filter(function(r){return r.ok;}).length;
-  var wrong=res.filter(function(r){return !r.ok;}),near=0,fam={};
-  wrong.forEach(function(r){var d=diffOrder(r.q,r.placed);r._diff=d;if(d.nearMiss)near++;
-    var f=r.q.gar||r.q.ruleName||'عام';fam[f]=(fam[f]||0)+1;});
+  var struggled=res.filter(function(r){return r.placed&&r.placed.length;});
+  var nearList=[],scatterList=[],fam={};
+  struggled.forEach(function(r){var d=diffOrder(r.q,r.placed);r._diff=d;
+    if(d.nearMiss)nearList.push(r);else scatterList.push(r);
+    var key=r.q.gar||r.q.ruleName||'عام';fam[key]=(fam[key]||0)+1;});
   var top=Object.keys(fam).map(function(k){return [k,fam[k]];}).sort(function(a,b){return b[1]-a[1];}).slice(0,3);
-  return {total:total,ok:ok,wrong:wrong,near:near,proj:ok+near,top:top};
+  return {total:total,ok:ok,nearList:nearList,scatterList:scatterList,near:nearList.length,scattered:scatterList.length,top:top};
 }
 function insightHTML(f){
-  if(!f.wrong.length)return '<div class="ins ok">\ud83c\udf89 جولة كاملة — لا أخطاء!</div>';
-  var h='<div class="ins">';
-  if(f.near>0&&f.proj>f.ok)h+='<div class="ins-jump">\ud83d\udca1 <b>'+f.near+'</b> من أخطائك مجرّد <b>تبديل بسيط</b> — لو ضبطتها تقفز من <b>'+f.ok+'</b> إلى <b>'+f.proj+'</b> من '+f.total+'.</div>';
-  if(f.top.length)h+='<div class="ins-top">أكثر الأنماط: '+f.top.map(function(t){return esc(t[0])+' ('+t[1]+')';}).join('، ')+'.</div>';
-  h+='<div class="ins-list">'+f.wrong.map(function(r){return '<div class="ins-q"><div class="zh">'+esc(r.q.answer)+'</div>'+(r._diff&&r._diff.desc?'<div class="ins-d">\ud83d\udd27 '+esc(r._diff.desc)+'</div>':'')+'</div>';}).join('')+'</div>';
+  if(!f.nearList.length&&!f.scatterList.length)
+    return '<div class="ins ok">\ud83c\udf89 جولة نظيفة \u2014 رتّبت الجُمل صح من أول مرّة. ماشٍ تمام، واصل.</div>';
+  var h='<div class="ins"><div class="ins-open">'+openerLine(f)+'</div>';
+  if(f.nearList.length){h+='<div class="ins-sec"><div class="ins-st">قريب جدًّا \u2014 بس مكان كلمتين:</div>';
+    f.nearList.forEach(function(r){var corr=ordTexts(r.q),d=r._diff;
+      h+='<div class="ins-q"><div class="zh" dir="ltr">'+esc(r.q.answer)+'</div>'+
+         '<div class="ins-fix">\ud83d\udc49 خلّ \u300c'+esc(corr[d.ia])+'\u300d قبل \u300c'+esc(corr[d.ib])+'\u300d.</div></div>';});
+    h+='</div>';}
+  if(f.scatterList.length){h+='<div class="ins-sec"><div class="ins-st">محتاجة إعادة ترتيب:</div>';
+    f.scatterList.forEach(function(r){var corr=ordTexts(r.q),rules=posRules(r.q);
+      h+='<div class="ins-q"><div class="zh" dir="ltr">'+esc(r.q.answer)+'</div>'+
+         '<div class="ins-chain" dir="ltr">'+corr.map(esc).join(' \u203a ')+'</div>'+
+         (rules.length?'<div class="ins-rule">\ud83d\udca1 '+rules.map(esc).join(' ')+'</div>':'')+'</div>';});
+    h+='</div>';}
   h+='</div>';return h;
 }
 function aiPrompt(f){
-  var lines=f.wrong.map(function(r,i){var corr=ordTexts(r.q).join(' '),you=(r.placed||[]).join(' ');
-    return (i+1)+') القاعدة: '+(r.q.ruleName||r.q.gar||'')+'\n   الصحيح: '+r.q.answer+'  ['+corr+']\n   ترتيب الطالب: '+(you||'(غير مكتمل)')+'\n   شرح مرجعي: '+(r.q.explain||'');}).join('\n');
-  return 'أنت معلّم HSK4 خبير وصبور. حلّل أخطاء الطالب في ترتيب الجُمل تحليلًا استقرائيًّا استدلاليًّا عميقًا. '+
-    'اكتب بالعربية الفصيحة واحتفظ بالكلمات الصينية كما هي، ولا تُطل. '+
-    'حقائق محسوبة لا تناقضها: أصاب '+f.ok+' من '+f.total+'، ومنها '+f.near+' خطأ تبديل بسيط (لو صُحّحت يصير '+f.proj+'). '+
-    'الأخطاء:\n'+lines+'\n\n'+
-    'أعِد JSON فقط (بلا أي نص خارجه): {"diagnosis":"تشخيص نمط الخطأ في جملتين","items":[{"n":1,"why":"لماذا ترتيبه خطأ والقاعدة الحاكمة بإيجاز قابل للتطبيق"}],"motivation":"تحفيز صادق مبني على الحقائق"}';
+  var arr=f.nearList.concat(f.scatterList);
+  var lines=arr.map(function(r,i){var corr=ordTexts(r.q).join(' '),you=(r.placed||[]).join(' ');
+    var kind=r._diff&&r._diff.nearMiss?'بدّل مكان كلمتين فقط':'رتّب أغلب الكلمات خطأ';
+    return (i+1)+') الصحيح: '+r.q.answer+'  ['+corr+']\n   سوّاها: '+you+'  ('+kind+')\n   إشارة: '+(r.q.explain||r.q.ruleName||'');}).join('\n');
+  return 'أنت مدرّب صيني ودود، تكلّم متعلّمًا واحدًا مباشرةً بصيغة \u00ab أنت \u00bb وبلهجة بسيطة دافئة. '+
+    'ممنوع تقول \u00ab الطالب \u00bb أو \u00ab أخطأت في كذا \u00bb بأسلوب جاف أو رسمي، وممنوع المبالغة في المدح أو الوعد بالتشجيع. '+
+    'بدل اللوم، علّمه قواعد موضع عملية يحفظها بسهولة، مثل: \u00ab لمّا تشوف 了 توقّعها آخر الجملة \u00bb، و\u00ab 在\u2026 تجي في البداية \u00bb، و\u00ab بعد 把 يجي المفعول بعدها الفعل \u00bb، و\u00ab 的 تلتصق قبل الاسم \u00bb، و\u00ab لا تحط هذي الكلمة في البداية \u00bb. '+
+    'اكتب بالعربية واحتفظ بالكلمات الصينية كما هي، وكن مختصرًا جدًّا. '+
+    'حقائق ليكون تشجيعك صادقًا (لا تكرّرها حرفيًّا): ضبط '+f.ok+' من '+f.total+'، و'+f.near+' كانت قريبة جدًّا. '+
+    'الجمل اللي تعثّر فيها:\n'+lines+'\n\n'+
+    'أعِد JSON فقط بلا أي نص خارجه: {"items":[{"n":1,"tip":"قاعدة موضع واحدة قصيرة بصيغة أنت تخلّيه يضبط ترتيب هذي الجملة، عملية وقابلة للحفظ، بلا لوم"}],"cheer":"سطر تشجيع صادق قصير مبني على أدائه الفعلي بدون مبالغة"}';
 }
 async function callQwen(prompt){
   var key=aiKey();if(!key)throw new Error('no-key');
   var r=await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',{
     method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:JSON.stringify({model:AI_MODEL,messages:[{role:'user',content:prompt}],temperature:0.4})});
+    body:JSON.stringify({model:AI_MODEL,messages:[{role:'user',content:prompt}],temperature:0.5})});
   if(!r.ok)throw new Error('http-'+r.status);
   var d=await r.json();
   return (d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'';
 }
 function aiReportHTML(data,f){
-  var h='<div class="air"><div class="air-h">\ud83e\udde0 تحليل ذكي عميق <span class="mdl">'+AI_MODEL+'</span></div>';
-  if(data.diagnosis)h+='<div class="air-diag">'+esc(data.diagnosis)+'</div>';
+  var arr=f.nearList.concat(f.scatterList);
+  var h='<div class="air"><div class="air-h">\ud83e\udde0 نصائح من مدرّبك <span class="mdl">'+AI_MODEL+'</span></div>';
   if(data.items&&data.items.length){h+='<div class="air-items">';
-    data.items.forEach(function(it){var r=f.wrong[(it.n||1)-1];
-      h+='<div class="air-q">'+(r?'<div class="zh">'+esc(r.q.answer)+'</div>':'')+'<div class="air-why">'+esc(it.why||'')+'</div></div>';});
+    data.items.forEach(function(it){var r=arr[(it.n||1)-1];
+      h+='<div class="air-q">'+(r?'<div class="zh" dir="ltr">'+esc(r.q.answer)+'</div>':'')+'<div class="air-why">'+esc(it.tip||it.why||'')+'</div></div>';});
     h+='</div>';}
-  if(data.motivation)h+='<div class="air-mot">\u2728 '+esc(data.motivation)+'</div>';
+  if(data.cheer)h+='<div class="air-mot">'+esc(data.cheer)+'</div>';
   h+='</div>';return h;
 }
 async function runEndReport(){
   var box=document.getElementById('endReport');if(!box)return;
   var f=sessionFacts();
   box.innerHTML=insightHTML(f);
-  if(!f.wrong.length)return;
-  if(!aiMode()){box.insertAdjacentHTML('beforeend','<div class="air-hint">فعّل «الأداء الذكي» \ud83e\udde0 في الصفحة الرئيسية لتحليل أعمق بالذكاء الاصطناعي.</div>');return;}
-  if(!aiKey()){box.insertAdjacentHTML('beforeend','<div class="air-hint">\ud83d\udd11 أضف مفتاح DashScope في «الأداء الذكي» لتفعيل التحليل العميق.</div>');return;}
-  if(!navigator.onLine){box.insertAdjacentHTML('beforeend','<div class="air-hint">أنت دون اتصال — عُرضت الحقائق فقط؛ التحليل العميق يحتاج إنترنت.</div>');return;}
-  var load=document.createElement('div');load.className='air-load';load.textContent='\ud83e\udde0 يحلّل الذكاء الاصطناعي جولتك…';box.appendChild(load);
+  if(!f.nearList.length&&!f.scatterList.length)return;
+  if(!aiMode()){box.insertAdjacentHTML('beforeend','<div class="air-hint">فعّل \u00ab الأداء الذكي \u00bb \ud83e\udde0 في الرئيسية عشان نصائح أعمق من مدرّبك.</div>');return;}
+  if(!aiKey()){box.insertAdjacentHTML('beforeend','<div class="air-hint">\ud83d\udd11 أضف مفتاح DashScope في \u00ab الأداء الذكي \u00bb لتفعيل النصائح العميقة.</div>');return;}
+  if(!navigator.onLine){box.insertAdjacentHTML('beforeend','<div class="air-hint">أنت دون اتصال \u2014 النصائح أعلاه شغّالة؛ التحليل الأعمق يحتاج إنترنت.</div>');return;}
+  var load=document.createElement('div');load.className='air-load';load.textContent='\ud83e\udde0 مدرّبك يجهّز لك نصائح الترتيب\u2026';box.appendChild(load);
   try{
     var t=await callQwen(aiPrompt(f));
     t=t.replace(/```json|```/g,'').trim();var m=t.match(/\{[\s\S]*\}/);
@@ -1074,7 +1114,7 @@ async function runEndReport(){
     load.remove();box.insertAdjacentHTML('beforeend',aiReportHTML(data,f));
   }catch(e){
     load.remove();
-    box.insertAdjacentHTML('beforeend','<div class="air-hint">تعذّر التحليل الذكي ('+esc(e.message||'خطأ')+') — الحقائق أعلاه دقيقة. تأكّد من المفتاح والاتصال.</div>');
+    box.insertAdjacentHTML('beforeend','<div class="air-hint">تعذّر جلب النصائح العميقة ('+esc(e.message||'خطأ')+') \u2014 النصائح أعلاه دقيقة. تأكّد من المفتاح والاتصال.</div>');
   }
 }
 
