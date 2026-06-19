@@ -633,6 +633,11 @@ body{background:
 .b-end{--bt:#0c0a08!important;background:#a39e8e!important}
 .b-base{--bt:#241f1b!important}
 /* === END === */
+
+/* AI report: generalized positional rules layout */
+.ins-rules{display:flex;flex-direction:column;gap:7px;margin:10px 0 4px}
+.air-rules{display:flex;flex-direction:column;gap:7px;margin-top:6px}
+.ins-foot{font-size:.8rem;color:#4f483d;margin-top:10px;line-height:1.6}
 </style>
 </head>
 <body>
@@ -1357,35 +1362,55 @@ function sessionFacts(){
   var top=Object.keys(fam).map(function(k){return [k,fam[k]];}).sort(function(a,b){return b[1]-a[1];}).slice(0,3);
   return {total:total,ok:ok,nearList:nearList,scatterList:scatterList,near:nearList.length,scattered:scatterList.length,top:top};
 }
+function ruleFor(fr,i,corr,q){
+  var k=grammarKey(fr,q.answer),r=role(fr),last=corr.length-1;
+  if(k==='了'||k==='吗'||k==='呢'||k==='吧'||fr==='过')return{key:'end:'+fr,txt:'لمّا تشوف «'+fr+'» حطّها آخر الجملة — ما تجي بالبداية أبدًا.'};
+  if(r==='b-end'&&i===last)return{key:'end:'+fr,txt:'«'+fr+'» تختم الجملة دائمًا.'};
+  if(k==='把')return{key:'ba',txt:'بعد «把» يجي المفعول ثم الفعل — لا الفعل طول.'};
+  if(k==='被')return{key:'bei',txt:'«被» يدخل المنفّذ ثم الفعل (المبني للمجهول).'};
+  if(k==='比')return{key:'bi',txt:'«比» + الطرف الثاني + الصفة (من دون «很»).'};
+  if(k==='得')return{key:'de2',txt:'بعد «得» يجي وصف الدرجة أو النتيجة.'};
+  if(k==='的'&&i<last)return{key:'de1',txt:'«的» تلتصق قبل الاسم مباشرة، ما تنفصل عنه.'};
+  if(k==='地')return{key:'di',txt:'«地» تربط الوصف بالفعل: وصف + «地» + فعل.'};
+  if(k==='在'||((r==='b-prep')&&i===0))return{key:'prep0:'+fr,txt:'«'+fr+'» تتصدّر الجملة (ظرف زمان/مكان).'};
+  if(r==='b-prep')return{key:'prep:'+fr,txt:'«'+fr+'» تجي قبل الفعل لا بعده.'};
+  if(fr==='一'&&q.answer.indexOf('就')>=0)return{key:'yijiu',txt:'«一…就»: 一 + فعل١ + 就 + فعل٢ (بمجرّد أن).'};
+  if(k==='只有'||k==='除非')return{key:'cond:'+fr,txt:'«'+fr+'» تتصدّر الشرط، وجوابه يجي بعده.'};
+  return null;
+}
+function collectRules(f){
+  var seen={},out=[];
+  f.nearList.concat(f.scatterList).forEach(function(r){
+    var corr=ordTexts(r.q);
+    for(var i=0;i<corr.length;i++){var ru=ruleFor(corr[i],i,corr,r.q);if(ru&&!seen[ru.key]){seen[ru.key]=1;out.push(ru.txt);}}
+  });
+  return out.slice(0,6);
+}
+function coachOpener(f){
+  if(f.near&&!f.scattered)return 'ترتيبك قريب. ثبّت هذي القواعد الموضعية وبيضبط معك:';
+  if(!f.near&&f.scattered)return 'خلّ تركيزك على «مكان» كل كلمة. هذي قواعد تثبت:';
+  return 'مفتاح الترتيب مواضع ثابتة — احفظ هذي وبتلقى الباقي يجي لحاله:';
+}
 function insightHTML(f){
-  if(!f.nearList.length&&!f.scatterList.length)
-    return '<div class="ins ok">\ud83c\udf89 جولة نظيفة \u2014 رتّبت الجُمل صح من أول مرّة. ماشٍ تمام، واصل.</div>';
-  var h='<div class="ins"><div class="ins-open">'+openerLine(f)+'</div>';
-  if(f.nearList.length){h+='<div class="ins-sec"><div class="ins-st">قريب جدًّا \u2014 بس مكان كلمتين:</div>';
-    f.nearList.forEach(function(r){var corr=ordTexts(r.q),d=r._diff;
-      h+='<div class="ins-q"><div class="zh" dir="ltr">'+esc(r.q.answer)+'</div>'+
-         '<div class="ins-fix">\ud83d\udc49 خلّ \u300c'+esc(corr[d.ia])+'\u300d قبل \u300c'+esc(corr[d.ib])+'\u300d.</div></div>';});
-    h+='</div>';}
-  if(f.scatterList.length){h+='<div class="ins-sec"><div class="ins-st">محتاجة إعادة ترتيب:</div>';
-    f.scatterList.forEach(function(r){var corr=ordTexts(r.q),rules=posRules(r.q);
-      h+='<div class="ins-q"><div class="zh" dir="ltr">'+esc(r.q.answer)+'</div>'+
-         '<div class="ins-chain" dir="ltr">'+corr.map(esc).join(' \u203a ')+'</div>'+
-         (rules.length?'<div class="ins-rule">\ud83d\udca1 '+rules.map(esc).join(' ')+'</div>':'')+'</div>';});
-    h+='</div>';}
-  h+='</div>';return h;
+  if(!f.nearList.length&&!f.scatterList.length)return '<div class="ins ok">🎉 جولة نظيفة — رتّبت الجُمل صح. واصل.</div>';
+  var rules=collectRules(f);
+  var h='<div class="ins"><div class="ins-open">'+coachOpener(f)+'</div><div class="ins-rules">';
+  if(rules.length)rules.forEach(function(t){h+='<div class="ins-rule">💡 '+esc(t)+'</div>';});
+  else h+='<div class="ins-rule">💡 ركّز على موضع الأدوات (了/在/把/的) داخل الجملة.</div>';
+  h+='</div><div class="ins-foot">ضبطت '+f.ok+' من '+f.total+' — ثبّت القواعد فوق ويصير الباقي أسهل.</div></div>';
+  return h;
 }
 function aiPrompt(f){
-  var arr=f.nearList.concat(f.scatterList);
-  var lines=arr.map(function(r,i){var corr=ordTexts(r.q).join(' '),you=(r.placed||[]).join(' ');
-    var kind=r._diff&&r._diff.nearMiss?'بدّل مكان كلمتين فقط':'رتّب أغلب الكلمات خطأ';
-    return (i+1)+') الصحيح: '+r.q.answer+'  ['+corr+']\n   سوّاها: '+you+'  ('+kind+')\n   إشارة: '+(r.q.explain||r.q.ruleName||'');}).join('\n');
-  return 'أنت مدرّب صيني ودود، تكلّم متعلّمًا واحدًا مباشرةً بصيغة \u00ab أنت \u00bb وبلهجة بسيطة دافئة. '+
-    'ممنوع تقول \u00ab الطالب \u00bb أو \u00ab أخطأت في كذا \u00bb بأسلوب جاف أو رسمي، وممنوع المبالغة في المدح أو الوعد بالتشجيع. '+
-    'بدل اللوم، علّمه قواعد موضع عملية يحفظها بسهولة، مثل: \u00ab لمّا تشوف 了 توقّعها آخر الجملة \u00bb، و\u00ab 在\u2026 تجي في البداية \u00bb، و\u00ab بعد 把 يجي المفعول بعدها الفعل \u00bb، و\u00ab 的 تلتصق قبل الاسم \u00bb، و\u00ab لا تحط هذي الكلمة في البداية \u00bb. '+
-    'اكتب بالعربية واحتفظ بالكلمات الصينية كما هي، وكن مختصرًا جدًّا. '+
-    'حقائق ليكون تشجيعك صادقًا (لا تكرّرها حرفيًّا): ضبط '+f.ok+' من '+f.total+'، و'+f.near+' كانت قريبة جدًّا. '+
-    'الجمل اللي تعثّر فيها:\n'+lines+'\n\n'+
-    'أعِد JSON فقط بلا أي نص خارجه: {"items":[{"n":1,"tip":"قاعدة موضع واحدة قصيرة بصيغة أنت تخلّيه يضبط ترتيب هذي الجملة، عملية وقابلة للحفظ، بلا لوم"}],"cheer":"سطر تشجيع صادق قصير مبني على أدائه الفعلي بدون مبالغة"}';
+  var seed=collectRules(f),toks={};
+  f.nearList.concat(f.scatterList).forEach(function(r){ordTexts(r.q).forEach(function(fr){var k=grammarKey(fr,r.q.answer);if(k)toks[k]=(toks[k]||0)+1;});});
+  var struct=Object.keys(toks).slice(0,8).join('، ')||'تراكيب متنوّعة';
+  return 'أنت مدرّب صيني ودود، تكلّم متعلّمًا واحدًا مباشرةً بصيغة «أنت» وبلهجة خليجية بسيطة دافئة. '+
+    'ممنوع تمامًا الأسلوب الرسمي التقريري مثل «الطالب أخطأ في كذا» أو «هذا غير مناسب»، وممنوع اللوم، وممنوع المدح المصطنع أو الوعد بالتشجيع مثل «بأعزّز لك». '+
+    'مهمتك الوحيدة: أعطِه 3 إلى 5 «قواعد موضع» عامّة قصيرة سهلة الحفظ تساعده على ترتيب أي جملة مستقبلًا. كل قاعدة لازم تذكر الكلمة الصينية وأين موضعها أو مع أي كلمة تجي/ما تجي، بالأسلوب هذا بالضبط: «لمّا تشوف 了 حطّها آخر الجملة»، «在 تتصدّر الجملة»، «بعد 把 يجي المفعول ثم الفعل»، «的 تلتصق قبل الاسم»، «لا تبدأ الجملة بهذي الكلمة»، «هذي الكلمة ما تجي مع تلك». '+
+    'ممنوع منعًا باتًّا ذكر أي جملة كاملة أو ترقيم جُمل أو قول «في الجملة الفلانية» — قواعد عامّة فقط يحفظها ويطبّقها على الكل. اكتب بالعربية واحتفظ بالحروف الصينية كما هي، وكن مختصرًا جدًّا وعمليًّا. '+
+    'التراكيب اللي تعثّر فيها هذي الجولة (استنبط قواعدك منها): '+struct+'. وقواعد مبدئية مستخرجة آليًّا (نقّحها ووحّد المكرّر ولا تعيدها حرفيًّا): '+seed.join(' | ')+'. '+
+    'حقيقة واحدة فقط لتكون لهجتك صادقة (لا تكرّرها ولا تبالغ): ضبط '+f.ok+' من '+f.total+'. '+
+    'أعِد JSON فقط بلا أي نص خارجه: {"rules":["قاعدة موضع عامّة قصيرة بصيغة أنت، عملية، بلا لوم وبلا ذكر أي جملة"],"cheer":"سطر واحد صادق قصير مبني على العدد الفعلي بدون مبالغة، أو اتركه فارغًا"}';
 }
 async function callQwen(prompt){
   var key=aiKey();if(!key)throw new Error('no-key');
@@ -1397,13 +1422,12 @@ async function callQwen(prompt){
   return (d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'';
 }
 function aiReportHTML(data,f){
-  var arr=f.nearList.concat(f.scatterList);
-  var h='<div class="air"><div class="air-h">\ud83e\udde0 نصائح من مدرّبك <span class="mdl">'+AI_MODEL+'</span></div>';
-  if(data.items&&data.items.length){h+='<div class="air-items">';
-    data.items.forEach(function(it){var r=arr[(it.n||1)-1];
-      h+='<div class="air-q">'+(r?'<div class="zh" dir="ltr">'+esc(r.q.answer)+'</div>':'')+'<div class="air-why">'+esc(it.tip||it.why||'')+'</div></div>';});
+  var h='<div class="air"><div class="air-h">🧠 قواعد موضع من مدرّبك <span class="mdl">'+AI_MODEL+'</span></div>';
+  var rules=data.rules||data.items||data.tips||[];
+  if(rules.length){h+='<div class="air-rules">';
+    rules.forEach(function(it){var t=(typeof it==='string')?it:(it.tip||it.rule||it.why||it.text||'');if(t)h+='<div class="air-why">💡 '+esc(t)+'</div>';});
     h+='</div>';}
-  if(data.cheer)h+='<div class="air-mot">'+esc(data.cheer)+'</div>';
+  if(data.cheer&&String(data.cheer).trim())h+='<div class="air-mot">'+esc(data.cheer)+'</div>';
   h+='</div>';return h;
 }
 async function runEndReport(){
