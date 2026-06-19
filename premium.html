@@ -1333,24 +1333,6 @@ function diffOrder(q,placed){
   return {nearMiss:false,scattered:true,n:diff.length};
 }
 /* concrete positional rules derived from the CORRECT order (offline, always available) */
-function posRules(q){
-  var corr=ordTexts(q),out=[];
-  for(var i=0;i<corr.length;i++){
-    var fr=corr[i],k=grammarKey(fr,q.answer),r=role(fr);
-    if(r==='b-end'&&i===corr.length-1){out.push('\u300c'+fr+'\u300d مكانها آخر الجملة.');continue;}
-    if(r==='b-prep'&&i===0){out.push('\u300c'+fr+'\u300d تجي في بداية الجملة.');continue;}
-    if(k==='把'||k==='被'){out.push('بعد \u300c'+fr+'\u300d يجي الشيء المتأثّر ثم الفعل \u2014 مو الفعل طول.');continue;}
-    if(k==='的'&&i<corr.length-1){out.push('\u300c'+fr+'\u300d تلتصق قبل الاسم: \u300c'+fr+'\u300d+\u300c'+corr[i+1]+'\u300d.');continue;}
-    if(k==='得'){out.push('بعد \u300c'+fr+'\u300d يجي وصف الدرجة/النتيجة.');continue;}
-    if(k==='比'&&i<corr.length-1){out.push('بعد \u300c'+fr+'\u300d يجي الطرف الثاني ثم الصفة.');continue;}
-  }
-  return out.slice(0,2);
-}
-function openerLine(f){
-  if(f.nearList.length&&!f.scatterList.length)return 'كنت قريب \u2014 أغلب اللي صار مجرّد تبديل مكان. عدّلها وتضبط:';
-  if(!f.nearList.length&&f.scatterList.length)return 'في جمل ترتيبها محتاج تركيز. خلّنا نفكّكها بقواعد موضع تثبت معك:';
-  return 'بعض الجمل كانت قريبة جدًّا وبعضها محتاجة ترتيب \u2014 هذي خريطتك:';
-}
 function sessionFacts(){
   var res=(typeof T!=='undefined'&&T&&T.results)||[];
   var total=res.length,ok=res.filter(function(r){return r.ok;}).length;
