@@ -638,6 +638,14 @@ body{background:
 .ins-rules{display:flex;flex-direction:column;gap:7px;margin:10px 0 4px}
 .air-rules{display:flex;flex-direction:column;gap:7px;margin-top:6px}
 .ins-foot{font-size:.8rem;color:#4f483d;margin-top:10px;line-height:1.6}
+.rep-tools{display:flex;gap:8px;margin:0 0 12px;flex-wrap:wrap}
+.rep-card{background:#fff;border:1px solid #e8dcc2;border-radius:12px;margin:0 0 10px;overflow:hidden}
+.rep-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 13px;cursor:pointer}
+.rep-when b{font-size:.92rem;color:#2a2418}.rep-when small{color:#6b5942}
+.rep-dl{background:#1f3a4d;color:#fff;border:none;border-radius:8px;padding:7px 11px;font-size:.78rem;font-weight:700;cursor:pointer;white-space:nowrap}
+.rep-body{padding:0 13px 13px;border-top:1px solid #f0e6d2}
+.rep-empty{text-align:center;color:#8a7a5e;padding:44px 16px;line-height:1.9}
+.reports-cta{background:linear-gradient(140deg,#1f3a4d,#16252f)!important}
 </style>
 </head>
 <body>
@@ -704,6 +712,10 @@ body{background:
       </div>
     </div>
 
+    <button class="cta-fit reports-cta" id="reportsCta" onclick="showReports()">
+      <span class="ic">📄</span>
+      <span><b>تقاريري</b><br><small>سجلّ جولاتك — اعرضها وحمّلها كوثيقة</small></span>
+    </button>
     <button class="cta-fit" id="fitCta" onclick="startFit({mode:'mix'})">
       <span class="ic"><i class="gi i-puzzle"></i></span>
       <span><b>ابدأ هنا · الوضع التمهيدي</b><br><small>قطع تتشابك بالشكل — تعلّم الترتيب باللمس</small></span>
@@ -813,6 +825,15 @@ body{background:
     <div><b>بطاقات الصور</b> <span class="zh">看图认词</span></div>
   </div>
   <div class="pic-scroll" id="picScroll"></div>
+</section>
+
+<!-- ================= REPORTS ================= -->
+<section class="screen" id="reports">
+  <div class="pic-head">
+    <button class="icon-btn" onclick="goHome()">‹</button>
+    <div><b>تقاريري</b> <span class="zh">我的报告</span></div>
+  </div>
+  <div class="pic-scroll" id="reportsList"></div>
 </section>
 
 <!-- ================= SHAPE-FIT (تمهيدي) ================= -->
@@ -1373,15 +1394,24 @@ function coachOpener(f){
   if(!f.near&&f.scattered)return 'خلّ تركيزك على «مكان» كل كلمة. هذي قواعد تثبت:';
   return 'مفتاح الترتيب مواضع ثابتة — احفظ هذي وبتلقى الباقي يجي لحاله:';
 }
-function insightHTML(f){
+function insightHTML(f,showRules){
   if(!f.nearList.length&&!f.scatterList.length)return '<div class="ins ok">🎉 جولة نظيفة — رتّبت الجُمل صح. واصل.</div>';
-  var rules=collectRules(f);
-  var h='<div class="ins"><div class="ins-open">'+coachOpener(f)+'</div><div class="ins-rules">';
-  if(rules.length)rules.forEach(function(t){h+='<div class="ins-rule">💡 '+esc(t)+'</div>';});
-  else h+='<div class="ins-rule">💡 ركّز على موضع الأدوات (了/在/把/的) داخل الجملة.</div>';
-  h+='</div><div class="ins-foot">ضبطت '+f.ok+' من '+f.total+' — ثبّت القواعد فوق ويصير الباقي أسهل.</div></div>';
+  var h='<div class="ins"><div class="ins-open">'+coachOpener(f)+'</div>';
+  if(f.nearList.length){h+='<div class="ins-sec"><div class="ins-st">قريب جدًّا — بس مكان كلمتين:</div>';
+    f.nearList.forEach(function(r){var corr=ordTexts(r.q),d=r._diff;
+      h+='<div class="ins-q"><span class="zh" dir="ltr">'+esc(r.q.answer)+'</span> <span class="ins-fix">👈 خلّ «'+esc(corr[d.ia])+'» قبل «'+esc(corr[d.ib])+'».</span></div>';});
+    h+='</div>';}
+  if(f.scatterList.length){h+='<div class="ins-sec"><div class="ins-st">محتاجة إعادة ترتيب:</div>';
+    f.scatterList.forEach(function(r){var corr=ordTexts(r.q);
+      h+='<div class="ins-q"><span class="zh" dir="ltr">'+esc(r.q.answer)+'</span> <span class="ins-fix">👈 رتّبها: <span dir="ltr">'+corr.map(function(x){return '«'+esc(x)+'»';}).join(' › ')+'</span></span></div>';});
+    h+='</div>';}
+  var rules=(showRules===false)?[]:collectRules(f);
+  if(rules.length){h+='<div class="ins-sec"><div class="ins-st">قواعد تثبت معك:</div><div class="ins-rules">';
+    rules.forEach(function(t){h+='<div class="ins-rule">💡 '+esc(t)+'</div>';});h+='</div></div>';}
+  h+='<div class="ins-foot">ضبطت '+f.ok+' من '+f.total+' — ثبّت القواعد فوق ويصير الباقي أسهل.</div></div>';
   return h;
 }
+
 function aiPrompt(f){
   var seed=collectRules(f),toks={};
   f.nearList.concat(f.scatterList).forEach(function(r){ordTexts(r.q).forEach(function(fr){var k=grammarKey(fr,r.q.answer);if(k)toks[k]=(toks[k]||0)+1;});});
@@ -1415,22 +1445,93 @@ function aiReportHTML(data,f){
 async function runEndReport(){
   var box=document.getElementById('endReport');if(!box)return;
   var f=sessionFacts();
-  box.innerHTML=insightHTML(f);
-  if(!f.nearList.length&&!f.scatterList.length)return;
-  if(!aiMode()){box.insertAdjacentHTML('beforeend','<div class="air-hint">فعّل \u00ab الأداء الذكي \u00bb \ud83e\udde0 في الرئيسية عشان نصائح أعمق من مدرّبك.</div>');return;}
-  if(!aiKey()){box.insertAdjacentHTML('beforeend','<div class="air-hint">\ud83d\udd11 أضف مفتاح DashScope في \u00ab الأداء الذكي \u00bb لتفعيل النصائح العميقة.</div>');return;}
-  if(!navigator.onLine){box.insertAdjacentHTML('beforeend','<div class="air-hint">أنت دون اتصال \u2014 النصائح أعلاه شغّالة؛ التحليل الأعمق يحتاج إنترنت.</div>');return;}
-  var load=document.createElement('div');load.className='air-load';load.textContent='\ud83e\udde0 مدرّبك يجهّز لك نصائح الترتيب\u2026';box.appendChild(load);
+  var struggled=f.nearList.length+f.scatterList.length;
+  var willAI=aiMode()&&aiKey()&&navigator.onLine&&struggled;
+  box.innerHTML=insightHTML(f,!willAI);
+  var rid=recordReport(f,null);
+  if(!struggled)return;
+  if(!aiMode()){box.insertAdjacentHTML('beforeend','<div class="air-hint">فعّل «الأداء الذكي» 🧠 في الرئيسية عشان نصائح أعمق من مدرّبك.</div>');return;}
+  if(!aiKey()){box.insertAdjacentHTML('beforeend','<div class="air-hint">🔑 أضف مفتاح DashScope في «الأداء الذكي» لتفعيل النصائح العميقة.</div>');return;}
+  if(!navigator.onLine){box.insertAdjacentHTML('beforeend','<div class="air-hint">أنت دون اتصال — النصائح أعلاه شغّالة؛ التحليل الأعمق يحتاج إنترنت.</div>');return;}
+  var load=document.createElement('div');load.className='air-load';load.textContent='🧠 مدرّبك يجهّز لك نصائح الترتيب…';box.appendChild(load);
   try{
     var t=await callQwen(aiPrompt(f));
-    t=t.replace(/```json|```/g,'').trim();var m=t.match(/\{[\s\S]*\}/);
-    var data=JSON.parse(m?m[0]:t);
+    t=t.replace(/```json|```/g,'').trim();var mm=t.match(/\{[\s\S]*\}/);
+    var data=JSON.parse(mm?mm[0]:t);
     load.remove();box.insertAdjacentHTML('beforeend',aiReportHTML(data,f));
+    updateReportAI(rid,data);
   }catch(e){
     load.remove();
-    box.insertAdjacentHTML('beforeend','<div class="air-hint">تعذّر جلب النصائح العميقة ('+esc(e.message||'خطأ')+') \u2014 النصائح أعلاه دقيقة. تأكّد من المفتاح والاتصال.</div>');
+    var rl=collectRules(f),fb='';
+    if(rl.length){fb='<div class="ins-sec"><div class="ins-st">قواعد تثبت معك:</div><div class="ins-rules">';rl.forEach(function(t){fb+='<div class="ins-rule">💡 '+esc(t)+'</div>';});fb+='</div></div>';}
+    box.insertAdjacentHTML('beforeend',fb+'<div class="air-hint">تعذّر جلب النصائح العميقة ('+esc(e.message||'خطأ')+') — اعتمد القواعد فوق.</div>');
   }
 }
+
+/* ===== سجلّ التقارير + تصدير وثيقة ===== */
+var REP_LS='hsk4b_reports';
+function loadReports(){try{return JSON.parse(localStorage.getItem(REP_LS)||'[]');}catch(e){return [];}}
+function saveReports(a){try{localStorage.setItem(REP_LS,JSON.stringify(a.slice(-60)));}catch(e){}}
+function recordReport(f,ai){
+  var near=f.nearList.map(function(r){var c=ordTexts(r.q),d=r._diff;return {ans:r.q.answer,a:c[d.ia],b:c[d.ib]};});
+  var scat=f.scatterList.map(function(r){return {ans:r.q.answer,chain:ordTexts(r.q)};});
+  var mode=(typeof T!=='undefined'&&T&&T.opt&&T.opt.mode)||'';
+  var rec={id:Date.now(),date:new Date().toLocaleString('ar-EG'),ok:f.ok,total:f.total,mode:mode,near:near,scatter:scat,rules:collectRules(f),ai:ai||null};
+  var a=loadReports();a.push(rec);saveReports(a);return rec.id;
+}
+function updateReportAI(id,ai){var a=loadReports();for(var i=a.length-1;i>=0;i--){if(a[i].id===id){a[i].ai=ai;break;}}saveReports(a);}
+function clearReports(){if(confirm('حذف كل التقارير؟')){saveReports([]);renderReports();}}
+function reportBody(rec){
+  var h='<div class="rep-meta">📅 '+esc(rec.date)+' · ضبطت '+rec.ok+' من '+rec.total+'</div>';
+  if(rec.near&&rec.near.length){h+='<div class="ins-sec"><div class="ins-st">قريب جدًّا — بس مكان كلمتين:</div>';
+    rec.near.forEach(function(n){h+='<div class="ins-q"><span class="zh" dir="ltr">'+esc(n.ans)+'</span> <span class="ins-fix">👈 خلّ «'+esc(n.a)+'» قبل «'+esc(n.b)+'».</span></div>';});h+='</div>';}
+  if(rec.scatter&&rec.scatter.length){h+='<div class="ins-sec"><div class="ins-st">محتاجة إعادة ترتيب:</div>';
+    rec.scatter.forEach(function(s){h+='<div class="ins-q"><span class="zh" dir="ltr">'+esc(s.ans)+'</span> <span class="ins-fix">👈 رتّبها: <span dir="ltr">'+(s.chain||[]).map(function(x){return '«'+esc(x)+'»';}).join(' › ')+'</span></span></div>';});h+='</div>';}
+  var R=(rec.ai&&rec.ai.rules&&rec.ai.rules.length)?rec.ai.rules:(rec.rules||[]);
+  if(R.length){h+='<div class="ins-sec"><div class="ins-st">قواعد تثبت معك:</div><div class="ins-rules">';
+    R.forEach(function(t){h+='<div class="ins-rule">💡 '+esc(typeof t==='string'?t:(t.tip||t.rule||''))+'</div>';});h+='</div></div>';}
+  if(rec.ai&&rec.ai.cheer)h+='<div class="air-mot">✨ '+esc(rec.ai.cheer)+'</div>';
+  if((!rec.near||!rec.near.length)&&(!rec.scatter||!rec.scatter.length))h+='<div class="ins ok">🎉 جولة نظيفة — رتّبت الجُمل صح.</div>';
+  return h;
+}
+function renderReports(){
+  var box=document.getElementById('reportsList');if(!box)return;
+  var a=loadReports().slice().reverse();
+  if(!a.length){box.innerHTML='<div class="rep-empty">ما عندك تقارير بعد. خلّص جولة وبيظهر تقريرها هنا 📄</div>';return;}
+  var h='<div class="rep-tools"><button class="btn ghost" onclick="downloadAllReports()">⬇️ تحميل الكل كوثيقة</button><button class="btn ghost" onclick="clearReports()">🗑️ حذف الكل</button></div>';
+  a.forEach(function(r){
+    h+='<div class="rep-card"><div class="rep-head" onclick="toggleReport('+r.id+')">'+
+       '<div class="rep-when"><b>'+esc(r.date)+'</b><br><small>ضبطت '+r.ok+' من '+r.total+(r.ai?' · 🧠':'')+'</small></div>'+
+       '<button class="rep-dl" onclick="event.stopPropagation();downloadReport('+r.id+')">⬇️ تحميل</button></div>'+
+       '<div class="rep-body" id="rep-'+r.id+'" style="display:none">'+reportBody(r)+'</div></div>';
+  });
+  box.innerHTML=h;
+}
+function toggleReport(id){var e=document.getElementById('rep-'+id);if(e)e.style.display=(e.style.display==='none')?'':'none';}
+function showReports(){go('reports');renderReports();}
+function reportDocHTML(recs){
+  var title='تقارير ترتيب الجُمل — HSK4 构句大师';
+  var body=recs.map(function(r){return '<section class="doc-rep">'+reportBody(r)+'</section>';}).join('');
+  return '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+title+'</title><style>'+
+    'body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#faf6ee;color:#2a2418;margin:0;padding:18px;line-height:1.75}'+
+    'h1{font-size:1.15rem;color:#7a5a2a;margin:0 0 14px}.doc-rep{background:#fff;border:1px solid #e8dcc2;border-radius:12px;padding:14px 16px;margin:0 0 16px}'+
+    '.rep-meta{font-size:.85rem;color:#6b5942;margin-bottom:10px;font-weight:700}.ins-sec{margin:12px 0 4px}'+
+    '.ins-st{font-size:.85rem;font-weight:800;color:#6b5942;margin-bottom:8px}'+
+    '.ins-q{background:#fffdf8;border:1px solid #ecdfc4;border-radius:10px;padding:7px 10px;margin:6px 0}'+
+    '.zh{font-family:"PingFang SC","Noto Sans CJK SC",sans-serif;direction:ltr;font-size:1rem;color:#1a1a1a}'+
+    '.ins-fix{font-size:.86rem;color:#155235;font-weight:700}.ins-rule{font-size:.85rem;color:#574009;margin:5px 0}'+
+    '.air-mot{margin-top:10px;font-weight:700;color:#7a5a2a}.ins.ok{color:#1f7048;font-weight:700}</style></head><body><h1>'+title+'</h1>'+body+'</body></html>';
+}
+function dlDoc(html,name){
+  if(typeof AndroidExport!=='undefined'&&AndroidExport&&AndroidExport.saveFile){try{AndroidExport.saveFile(name,html);toast('تم الحفظ في «التنزيلات» ✓');return;}catch(e){}}
+  try{var blob=new Blob([html],{type:'text/html;charset=utf-8'});var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(url);a.remove();},1200);}
+  catch(e){toast('تعذّر التحميل على هذا الجهاز');}
+}
+function downloadReport(id){var r=loadReports().filter(function(x){return x.id===id;});if(!r.length)return;dlDoc(reportDocHTML(r),'HSK4-تقرير-'+id+'.html');}
+function downloadAllReports(){var a=loadReports().slice().reverse();if(!a.length)return;dlDoc(reportDocHTML(a),'HSK4-تقاريري.html');}
+
 
 function endSession(){
   go('end');
