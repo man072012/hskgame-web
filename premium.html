@@ -1100,7 +1100,7 @@ function touchStreak(){
 /* ---------- session ---------- */
 let T=null;
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
-function startSession(opt){
+function startSession(opt){try{
   touchStreak();
   let pool=[];
   if(opt.mode==='mix') pool=shuffle(ORDER).slice(0,10);
@@ -1116,7 +1116,7 @@ function startSession(opt){
     pool=shuffle(w).slice(0,10);
   }
   T={opt,qs:pool,idx:0,hearts:5,stars:0,correct:0,combo:0,xp:0,lastOpt:opt,results:[]};
-  go('play');renderQ();
+  go('play');renderQ();}catch(__e){try{if(typeof toast==='function')toast('تعذّر بدء التحدّي: '+(__e&&__e.message||__e));}catch(_e){}if(window.console&&console.error)console.error('startSession',__e);}
 }
 function replaySession(){startSession(T.lastOpt);}
 
@@ -1766,6 +1766,7 @@ document.getElementById('sndBtn').innerHTML=S.sound?'<i class="gi i-vol"></i>':'
 renderHome();
 ['touchstart','click'].forEach(ev=>document.addEventListener(ev,function unlock(){ac();document.removeEventListener(ev,unlock);},{once:true}));
 </script>
+<script>window.addEventListener('error',function(ev){try{if(typeof toast==='function')toast('⚠ خطأ: '+(ev.message||(ev.error&&ev.error.message)||'غير معروف'));}catch(_){}});window.addEventListener('unhandledrejection',function(ev){try{if(typeof toast==='function')toast('⚠ خطأ غير ممسوك');}catch(_){}});</script>
 <script>
 const PFX_KEY='hsk4builder_v1';
 function exportProgress(){let v='';try{v=localStorage.getItem(PFX_KEY)||'';}catch(e){}const blob=new Blob([v||'{}'],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='banialjumal-progress-'+new Date().toISOString().slice(0,10)+'.json';a.click();}
